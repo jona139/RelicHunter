@@ -54,6 +54,8 @@ public class RelicHunterPanel extends PluginPanel {
     private final Border defaultButtonBorder = UIManager.getBorder("Button.border");
     private final Border selectedButtonBorder = BorderFactory.createLineBorder(ColorScheme.BRAND_ORANGE, 2);
 
+
+    // Constructor
     public RelicHunterPanel(RelicHunterPlugin plugin, RelicHunterConfig config) {
         super(false);
         this.plugin = plugin;
@@ -139,9 +141,7 @@ public class RelicHunterPanel extends PluginPanel {
         JPanel wrapperPanel = new JPanel(new BorderLayout());
         wrapperPanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
         wrapperPanel.add(contentPanel, BorderLayout.NORTH);
-        add(wrapperPanel, BorderLayout.CENTER);
-
-        // Initial UI updates are called from Plugin's startUp/onGameStateChanged
+        add(wrapperPanel, BorderLayout.CENTER); // Add wrapper to the scrollable PluginPanel
     }
 
     // --- UI Creation Helpers ---
@@ -233,6 +233,7 @@ public class RelicHunterPanel extends PluginPanel {
             boolean canActivate = config.skillingRelicsApprentice() > 0 || config.skillingRelicsJourneyman() > 0 ||
                     config.combatRelicsApprentice() > 0 || config.combatRelicsJourneyman() > 0 ||
                     config.explorationRelicsApprentice() > 0 || config.explorationRelicsJourneyman() > 0;
+            // TODO: Add checks for higher tiers later
             activateButton.setEnabled(canActivate);
         });
     }
@@ -260,19 +261,23 @@ public class RelicHunterPanel extends PluginPanel {
                 skillTierLabels.values().forEach(label -> label.setText("Error"));
                 return;
             }
-            GearTier meleeTier = config.meleeGearTier();
-            meleeGearTierLabel.setText(String.format("Melee Gear: %s", meleeTier.getDisplayName()));
-            meleeGearTierLabel.setToolTipText(meleeTier.getDescription());
-            meleeGearTierLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-            for (Skill skill : skillTierLabels.keySet()) {
-                JLabel label = skillTierLabels.get(skill);
-                SkillTier tier = plugin.getSkillTier(skill);
-                label.setText(String.format("%s: %s (%d)",
-                        skill.getName(), tier.getDisplayName(), tier.getLevelCap()));
-                label.setForeground(tier == SkillTier.LOCKED ? ColorScheme.DARK_GRAY_COLOR : ColorScheme.LIGHT_GRAY_COLOR);
+            try {
+                GearTier meleeTier = config.meleeGearTier();
+                meleeGearTierLabel.setText(String.format("Melee Gear: %s", meleeTier.getDisplayName()));
+                meleeGearTierLabel.setToolTipText(meleeTier.getDescription());
+                meleeGearTierLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
+
+                for (Skill skill : skillTierLabels.keySet()) {
+                    JLabel label = skillTierLabels.get(skill);
+                    SkillTier tier = plugin.getSkillTier(skill);
+                    label.setText(String.format("%s: %s (%d)", skill.getName(), tier.getDisplayName(), tier.getLevelCap()));
+                    label.setForeground(tier == SkillTier.LOCKED ? ColorScheme.DARK_GRAY_COLOR : ColorScheme.LIGHT_GRAY_COLOR);
+                }
+                progressionTiersPanel.revalidate();
+                progressionTiersPanel.repaint();
+            } catch (Exception e) {
+                log.error("Unexpected error during updateProgressionTiersDisplay", e);
             }
-            progressionTiersPanel.revalidate();
-            progressionTiersPanel.repaint();
         });
     }
 
@@ -305,6 +310,7 @@ public class RelicHunterPanel extends PluginPanel {
             choicePanel.repaint();
             contentPanel.revalidate();
             contentPanel.repaint();
+            if (getParent() instanceof JScrollPane) { ((JScrollPane) getParent()).getViewport().getView().repaint(); } else { repaint(); }
         });
     }
 
@@ -318,6 +324,7 @@ public class RelicHunterPanel extends PluginPanel {
             choicePanel.repaint();
             contentPanel.revalidate();
             contentPanel.repaint();
+            if (getParent() instanceof JScrollPane) { ((JScrollPane) getParent()).getViewport().getView().repaint(); } else { repaint(); }
         });
     }
 
@@ -344,6 +351,7 @@ public class RelicHunterPanel extends PluginPanel {
             choicePanel.repaint();
             contentPanel.revalidate();
             contentPanel.repaint();
+            if (getParent() instanceof JScrollPane) { ((JScrollPane) getParent()).getViewport().getView().repaint(); } else { repaint(); }
         });
     }
 

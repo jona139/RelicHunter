@@ -1,0 +1,272 @@
+// Filename: src/main/resources/relic_hunter_item_data.json
+{
+  "gearTiers": {
+    "STEEL": {
+      "weapons": [
+        1281, // Steel sword
+        1325, // Steel scimitar
+        1207, // Steel dagger
+        1365, // Steel battleaxe
+        1311, // Steel 2h sword
+        1341, // Steel warhammer
+        3097, // Steel claws
+        1353, // Steel axe (Used for Woodcutting, but has Atk req)
+        3192 // Steel halberd
+        // 1239 Steel spear - Requires Barbarian training, maybe exclude? Or Exploration unlock?
+        // Decorative sword (red) - ID 4071 - Quest item, maybe exclude?
+        // 45474 Steel scimitar (Different ID from RuneHQ/GE Tracker? Using 1325 from ItemDB)
+        // Steel hasta - No distinct ID found easily, Zamorakian hasta is higher tier
+        // Steel defender - Requires Warrior's Guild, maybe separate unlock? ID 8846
+      ],
+      "armour": [
+        // TODO: Add Steel armour IDs (plate, chain, helms, shield, boots, gloves)
+        1119, // Steel platebody
+        1069, // Steel platelegs
+        1083, // Steel plateskirt
+        1141, // Steel med helm
+        1157, // Steel full helm
+        1177, // Steel sq shield
+        1191, // Steel kiteshield
+        1105 // Steel chainbody
+        // Steel boots ID 4123
+        // Steel gauntlets ID 3753
+      ]
+    },
+    "MITHRIL": {
+      "weapons": [
+        1285, // Mithril sword (RuneHQ uses 674, GE Tracker/ItemDB use 1285)
+        1329, // Mithril scimitar
+        1209, // Mithril dagger
+        1369, // Mithril battleaxe
+        1315, // Mithril 2h sword
+        1343, // Mithril warhammer (RuneHQ uses 1211, GE Tracker/ItemDB use 1343)
+        3098, // Mithril claws
+        1355, // Mithril axe
+        3196, // Mithril halberd
+        1241 // Mithril spear
+        // Mithril hasta - No distinct ID found easily
+        // Mithril defender - ID 8848
+        // Excalibur - ID 35 - Quest item
+        // Decorative sword (white) - ID 4073/4506 - Castle Wars/Trouble Brewing minigame rewards
+      ],
+      "armour": [
+        // TODO: Add Mithril armour IDs
+        1121, // Mithril platebody
+        1071, // Mithril platelegs
+        1085, // Mithril plateskirt
+        1143, // Mithril med helm
+        1159, // Mithril full helm
+        1179, // Mithril sq shield
+        1195, // Mithril kiteshield
+        1107 // Mithril chainbody
+        // Mithril boots ID 4125
+        // Mithril gauntlets ID 3755
+      ]
+    },
+    "ADAMANT": {
+      "weapons": [
+        1287, // Adamant sword (RuneHQ uses 31, GE Tracker/ItemDB use 1287)
+        1331, // Adamant scimitar
+        1211, // Adamant dagger (RuneHQ uses 16, GE Tracker/ItemDB use 1211)
+        1371, // Adamant battleaxe (RuneHQ uses 14, GE Tracker/ItemDB use 1371)
+        1317, // Adamant 2h sword (RuneHQ uses 36, GE Tracker/ItemDB use 1317)
+        1345, // Adamant warhammer (RuneHQ uses 1690, GE Tracker/ItemDB use 1345)
+        // Adamant cane - ID 13097 - Clue scroll item
+        3099, // Adamant claws
+        1357, // Adamant axe (RuneHQ uses 18, GE Tracker/ItemDB use 1357)
+        3198, // Adamant halberd (RuneHQ uses 1436, GE Tracker/ItemDB use 3198)
+        1243 // Adamant spear (RuneHQ uses 32, GE Tracker/ItemDB use 1243)
+        // Fremennik blade - ID 3758 - Quest item
+        // Battlestaff - ID 1391 - Basic magic staff, maybe separate category?
+        // Bryophyta's staff - ID 22370 - Specific boss drop
+        // Pharaoh's sceptre - ID 9044 - PP reward
+        // Swamp lizard - ID 6961 - Hunter item used as weapon
+        // Adamant defender - ID 8850
+        // Decorative sword (gold) - ID 4508 - Castle Wars reward
+      ],
+      "armour": [
+        // TODO: Add Adamant armour IDs
+        1123, // Adamant platebody
+        1073, // Adamant platelegs
+        1087, // Adamant plateskirt
+        1145, // Adamant med helm
+        1161, // Adamant full helm
+        1183, // Adamant sq shield
+        1199, // Adamant kiteshield
+        1109 // Adamant chainbody
+        // Adamant boots ID 4127
+        // Adamant gauntlets ID 7460
+      ]
+    },
+    "RUNE": {
+      "weapons": [
+        1289, // Rune sword
+        1333, // Rune scimitar
+        1213, // Rune dagger
+        1373, // Rune battleaxe
+        1319, // Rune 2h sword
+        1347, // Rune warhammer
+        // Rune cane - ID 13099 - Clue scroll item
+        3101, // Rune claws
+        1359, // Rune axe
+        3202, // Rune halberd
+        1247, // Rune spear
+        // Brine sabre - ID 11037 - Specific monster drop
+        // Gilded items (hasta, spear, 2h, scimitar) - Cosmetic, maybe exclude? IDs 12459, 12469, 20002, 12389
+        // Ivandis flail - ID 7671/7673 - Quest item
+        // Katana - ID 686 - Clue scroll item
+        // Mystic staff - ID 1401 etc. - Magic weapon
+        // Rune defender - ID 8850
+        // Hill giant club - ID 6609 - Specific monster drop
+        // Barronite mace - ID 25934 - Below the Ice Mountain reward
+      ],
+      "armour": [
+        // TODO: Add Rune armour IDs
+        1127, // Rune platebody
+        1079, // Rune platelegs
+        1093, // Rune plateskirt
+        1147, // Rune med helm
+        1163, // Rune full helm
+        1185, // Rune sq shield
+        1201, // Rune kiteshield
+        1113 // Rune chainbody
+        // Rune boots ID 4131
+        // Rune gauntlets ID 7461
+      ]
+    },
+    "GRANITE": { // Approx Lvl 50 items
+      "weapons": [
+        4153, // Granite maul
+        21646, // Granite longsword
+        21742 // Granite hammer
+        // Leaf-bladed spear - ID 4158 - Slayer item
+        // Leaf-bladed sword - ID 11902 - Slayer item
+        // Ancient staff - ID 4675 - Desert Treasure reward
+        // Ancient sceptre - ID 27277 - Muspah drop
+        // Bone mace - ID 22951 - Rag and Bone Man II reward
+        // Iban's staff - ID 1409/1410 - Quest/Minigame item
+        // Orange salamander - ID 10146 - Hunter item
+        // Eclipse atlatl - ID 28592 - Star gaze reward
+        // Purging staff - Wilderness slayer item, no standard ID found easily
+        // Keris - ID 10581 etc. - Quest item/variants
+      ],
+      "armour": [
+        // TODO: Add Granite armour IDs if applicable (Granite Shield ID 3122)
+      ]
+    },
+    "DRAGON": { // Approx Lvl 60 items
+      "weapons": [
+        1215, // Dragon dagger (Using base ID, p/p+/p++ variants exist 5680, 5698)
+        4587, // Dragon scimitar
+        1377, // Dragon battleaxe
+        1434, // Dragon mace
+        3204, // Dragon halberd
+        7158, // Dragon 2h sword
+        13576, // Dragon warhammer
+        // Dragon sword - ID 21009
+        // Dragon longsword - ID 1305
+        // Dragon claws - ID 11785
+        // Obsidian weapons (Tzhaar-ket-om, Toktz-xil-ak, etc.) - IDs 6528, 6523 etc. - require specific unlocks/shops?
+        // Colossal blade - ID 27670 - Giant's Foundry reward
+        // Viggora's chainmace - ID 22545 - Wilderness weapon
+        // Barrelchest anchor - ID 10887 - Great Olm drop
+        // Red salamander - ID 10147 - Hunter item
+      ],
+      "armour": [
+        // TODO: Add Dragon armour IDs (Plate, Legs, Skirt, Full Helm, Sq Shield, Kiteshield, Chain, Boots, Gloves)
+        11335, // Dragon full helm
+        14479, // Dragon platebody
+        4087, // Dragon platelegs
+        4585, // Dragon plateskirt
+        1187, // Dragon sq shield
+        21633, // Dragon kiteshield
+        3140, // Dragon chainbody
+        11732 // Dragon boots
+        // Dragon gauntlets don't exist, use specific gloves like Barrows/Ferocious
+      ]
+    },
+    "ABYSSAL_BARROWS": { // Approx Lvl 70 items
+      "weapons": [
+        13263, // Abyssal bludgeon
+        13265, // Abyssal dagger
+        4151, // Abyssal whip
+        // Crystal axe - ID 23897/23898 etc. - Requires Song of the Elves
+        23997, // Crystal halberd (inactive ID 4212?) - Requires Roving Elves
+        11787, // Saradomin sword
+        11824, // Zamorakian spear
+        // Zamorakian hasta - ID 11889 (made from spear)
+        // Blue moon spear - Not found, likely RS3 item?
+        4718, // Dharok's greataxe
+        // Dual macuahuitl - ID 26378 - Raids 3 drop
+        4726, // Guthan's warspear
+        4755, // Torag's hammers (ID is for the pair)
+        // Ursine chainmace - ID 27192 - Wilderness weapon
+        4747, // Verac's flail
+        4710, // Ahrim's staff
+        // Black salamander - ID 10149 - Hunter item
+        // Avernic defender - ID 22322 - Made from Dragon defender
+      ],
+      "armour": [
+        // TODO: Add Barrows/Crystal armour IDs
+        4716, // Dharok's helm
+        4720, // Dharok's platebody
+        4722, // Dharok's platelegs
+        4724, // Guthan's helm
+        4728, // Guthan's platebody
+        4730, // Guthan's chainskirt
+        4745, // Torag's helm
+        4749, // Torag's platebody
+        4751, // Torag's platelegs
+        4753, // Verac's helm
+        4757, // Verac's brassard
+        4759, // Verac's plateskirt
+        4708, // Ahrim's hood
+        4712, // Ahrim's robetop
+        4714 // Ahrim's robeskirt
+        // Karil's items are Ranged
+        // Crystal armour IDs depend on version (e.g., 23971 Helm, 23975 Body, 23979 Legs for base)
+      ]
+    },
+    "GODSWORD": { // Approx Lvl 75 items
+      "weapons": [
+        12954, // Abyssal tentacle (made from whip)
+        21012, // Arclight (made from Darklight)
+        21015, // Dinh's bulwark
+        21003, // Elder maul
+        11802, // Armadyl godsword
+        11804, // Bandos godsword
+        11806, // Saradomin godsword
+        11808, // Zamorak godsword
+        // Saradomin's blessed sword - ID 12809 (made from Sara sword)
+        11791, // Staff of the dead
+        // Staff of balance - ID 24423 (made from Staff of the dead)
+        // Staff of light - ID 15486 (RS3 ID?) - Not directly comparable in OSRS
+        // Toxic staff of the dead - ID 12904 (made from Staff of the dead)
+        27259 // Voidwaker
+      ],
+      "armour": [
+        // TODO: Add relevant Lvl 75 armour (e.g., specific GWD items not covered by Barrows?)
+      ]
+    },
+    "HIGH_TIER": { // Approx Lvl 80+ items
+      "weapons": [
+        22325, // Scythe of vitur (inactive 22486)
+        24417, // Inquisitor's mace
+        23995, // Blade of saeldor (inactive 24237)
+        22324, // Ghrazi rapier
+        28338, // Soulreaper axe
+        // Keris partisan variants (Breaching 27655, Corruption 27660, Sun 27665)
+        // Tecu salamander - ID 28590 - Hunter item
+        // Noxious halberd - RS3 item
+      ],
+      "armour": [
+        // TODO: Add relevant Lvl 80+ armour
+        24419, // Inquisitor's great helm
+        24420, // Inquisitor's hauberk
+        24421, // Inquisitor's plateskirt
+        21018 // Ferocious gloves (req Defence, part of melee set)
+      ]
+    }
+    // NOTE: Skill capes (Level 99 section in user's list) are not included here as they aren't typical gear progression tiers
+  }
+}

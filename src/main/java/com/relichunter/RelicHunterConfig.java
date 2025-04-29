@@ -2,11 +2,13 @@
 // Content:
 package com.relichunter;
 
+import net.runelite.client.config.Alpha;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 
+import java.awt.Color;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,7 +25,6 @@ public interface RelicHunterConfig extends Config
     )
     String relicCountsSection = "relicCounts";
 
-    // Renamed section for clarity
     @ConfigSection(
             name = "Progression Tiers",
             description = "Current unlocked tier for skills (level cap) or gear (melee equip).",
@@ -31,6 +32,14 @@ public interface RelicHunterConfig extends Config
             closedByDefault = true
     )
     String progressionTiersSection = "progressionTiers";
+
+    @ConfigSection(
+            name = "Visual Overlays",
+            description = "Settings for visual indicators and overlays.",
+            position = 50,
+            closedByDefault = false
+    )
+    String visualOverlaysSection = "visualOverlays";
 
 
     @ConfigSection(
@@ -42,9 +51,8 @@ public interface RelicHunterConfig extends Config
     String managementSection = "management";
 
 
-    // --- Tiered Relic Counts --- (Unchanged from previous version)
+    // --- Tiered Relic Counts ---
 
-    // Skilling Relics
     @ConfigItem(keyName = "skillingRelicsApprentice", name = "Skilling (Apprentice)", description = "Number of Apprentice Skilling Relics held.", position = 1, section = relicCountsSection)
     default int skillingRelicsApprentice() { return 0; }
     void setSkillingRelicsApprentice(int count);
@@ -55,7 +63,6 @@ public interface RelicHunterConfig extends Config
 
     // TODO: Add Expert, Master, Grandmaster counts for Skilling relics
 
-    // Combat Relics
     @ConfigItem(keyName = "combatRelicsApprentice", name = "Combat (Apprentice)", description = "Number of Apprentice Combat Relics held.", position = 5, section = relicCountsSection)
     default int combatRelicsApprentice() { return 0; }
     void setCombatRelicsApprentice(int count);
@@ -66,7 +73,6 @@ public interface RelicHunterConfig extends Config
 
     // TODO: Add Expert, Master, Grandmaster counts for Combat relics
 
-    // Exploration Relics
     @ConfigItem(keyName = "explorationRelicsApprentice", name = "Exploration (Apprentice)", description = "Number of Apprentice Exploration Relics held.", position = 9, section = relicCountsSection)
     default int explorationRelicsApprentice() { return 0; }
     void setExplorationRelicsApprentice(int count);
@@ -80,32 +86,10 @@ public interface RelicHunterConfig extends Config
 
     // --- Progression Tiers ---
 
-    // Melee Gear Tier (Used for Attack, Strength, Defence equip restrictions)
-    @ConfigItem(keyName = "meleeGearTier", name = "Melee Gear Tier", description = "Highest tier of melee equipment allowed (Bronze/Iron/Steel default).", position = 11, section = progressionTiersSection)
-    default GearTier meleeGearTier() { return GearTier.BASIC; } // Default to basic gear allowed
+    @ConfigItem(keyName = "meleeGearTier", name = "Melee Gear Tier", description = "Highest tier of melee equipment allowed.", position = 11, section = progressionTiersSection)
+    default GearTier meleeGearTier() { return GearTier.STEEL; }
     void setMeleeGearTier(GearTier tier);
 
-    // REMOVED: Attack, Strength, Defence Skill Tiers (replaced by meleeGearTier)
-	/*
-	@ConfigItem(keyName = "attackTier", name = "Attack Tier", description = "Current unlocked tier for Attack.", position = 11, section = progressionTiersSection)
-	default SkillTier attackTier() { return SkillTier.APPRENTICE; }
-	void setAttackTier(SkillTier tier);
-
-	@ConfigItem(keyName = "strengthTier", name = "Strength Tier", description = "Current unlocked tier for Strength.", position = 12, section = progressionTiersSection)
-	default SkillTier strengthTier() { return SkillTier.APPRENTICE; }
-	void setStrengthTier(SkillTier tier);
-
-	@ConfigItem(keyName = "defenceTier", name = "Defence Tier", description = "Current unlocked tier for Defence.", position = 13, section = progressionTiersSection)
-	default SkillTier defenceTier() { return SkillTier.APPRENTICE; }
-	void setDefenceTier(SkillTier tier);
-	*/
-
-    // Hitpoints Tier (Still uses level cap via SkillTier)
-    @ConfigItem(keyName = "hitpointsTier", name = "Hitpoints Tier", description = "Current unlocked tier for Hitpoints.", position = 14, section = progressionTiersSection)
-    default SkillTier hitpointsTier() { return SkillTier.APPRENTICE; } // Still starts unlocked
-    void setHitpointsTier(SkillTier tier);
-
-    // Ranged/Magic/Prayer Tiers (Still use level cap via SkillTier, unlocked by Combat relics)
     @ConfigItem(keyName = "rangedTier", name = "Ranged Tier", description = "Current unlocked tier for Ranged.", position = 15, section = progressionTiersSection)
     default SkillTier rangedTier() { return SkillTier.LOCKED; }
     void setRangedTier(SkillTier tier);
@@ -118,7 +102,6 @@ public interface RelicHunterConfig extends Config
     default SkillTier magicTier() { return SkillTier.LOCKED; }
     void setMagicTier(SkillTier tier);
 
-    // Skilling Skill Tiers (Remain unchanged, unlocked by Skilling relics)
     @ConfigItem(keyName = "cookingTier", name = "Cooking Tier", description = "Current unlocked tier for Cooking.", position = 18, section = progressionTiersSection)
     default SkillTier cookingTier() { return SkillTier.LOCKED; }
     void setCookingTier(SkillTier tier);
@@ -144,11 +127,11 @@ public interface RelicHunterConfig extends Config
     void setCraftingTier(SkillTier tier);
 
     @ConfigItem(keyName = "smithingTier", name = "Smithing Tier", description = "Current unlocked tier for Smithing.", position = 24, section = progressionTiersSection)
-    default SkillTier smithingTier() { return SkillTier.APPRENTICE; } // Starting skill
+    default SkillTier smithingTier() { return SkillTier.APPRENTICE; }
     void setSmithingTier(SkillTier tier);
 
     @ConfigItem(keyName = "miningTier", name = "Mining Tier", description = "Current unlocked tier for Mining.", position = 25, section = progressionTiersSection)
-    default SkillTier miningTier() { return SkillTier.APPRENTICE; } // Starting skill
+    default SkillTier miningTier() { return SkillTier.APPRENTICE; }
     void setMiningTier(SkillTier tier);
 
     @ConfigItem(keyName = "herbloreTier", name = "Herblore Tier", description = "Current unlocked tier for Herblore.", position = 26, section = progressionTiersSection)
@@ -184,14 +167,27 @@ public interface RelicHunterConfig extends Config
     void setConstructionTier(SkillTier tier);
 
 
-    // --- Testing & Management ---
+    // --- Visual Overlays ---
+    @ConfigItem( keyName = "showItemRestrictions", name = "Highlight Restricted Items", description = "Enable to visually tint items you cannot currently use.", position = 51, section = visualOverlaysSection )
+    default boolean showItemRestrictions() { return true; }
+    void setShowItemRestrictions(boolean show);
 
+    @Alpha
+    @ConfigItem( keyName = "itemRestrictionColor", name = "Restriction Tint Color", description = "Color used to tint restricted items.", position = 52, section = visualOverlaysSection )
+    default Color itemRestrictionColor() { return new Color(255, 0, 0, 100); }
+    void setItemRestrictionColor(Color color);
+
+    @ConfigItem( keyName = "showSkillTierVisuals", name = "Show Skill Tier Visuals", description = "Enable to show tier status (Locked tint, level cap) on the Skills tab.", position = 53, section = visualOverlaysSection )
+    default boolean showSkillTierVisuals() { return true; }
+    // Setter not strictly needed
+
+
+    // --- Testing & Management ---
     @ConfigItem(keyName = "resetProgressionButton", name = "Reset Progression", description = "Resets all unlocked relics and relic counts to zero. Requires confirmation.", position = 101, section = managementSection, warning = "This will completely reset your Relic Hunter progress tracked by this plugin!")
     default boolean resetProgressionButton() { return false; }
 
 
     // --- Internal State ---
-
     @ConfigItem(keyName = "unlockedRelics", name = "", description = "Stores the set of unique IDs for unlocked content.", hidden = true)
     default Set<String> unlockedRelics() { return new HashSet<>(); }
     void setUnlockedRelics(Set<String> unlockedIds);

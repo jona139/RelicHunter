@@ -2,11 +2,16 @@
 // Content:
 package com.relichunter;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.relichunter.data.ItemDataRoot;
+import com.relichunter.data.TierData;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.client.callback.ClientThread; // Import ClientThread
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
@@ -14,15 +19,21 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
+import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.Text;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -40,21 +51,31 @@ import java.util.stream.Collectors;
 public class RelicHunterPlugin extends Plugin
 {
     static final String CONFIG_GROUP = "relichunter";
+    private static final String ITEM_DATA_JSON_PATH = "/relic_hunter_item_data.json";
 
+    // Injected Dependencies
     @Inject private Client client;
     @Inject private RelicHunterConfig config;
     @Inject private ClientToolbar clientToolbar;
     @Inject private ConfigManager configManager;
+    @Inject private Gson gson;
+    @Inject private OverlayManager overlayManager;
+    @Inject private ItemRestrictionOverlay itemRestrictionOverlay;
+    @Inject private SkillTabOverlay skillTabOverlay;
+    @Inject private ClientThread clientThread;
 
+    // Plugin State
     private RelicHunterPanel panel;
     private NavigationButton navButton;
     private final Random random = new Random();
     private boolean initialPanelUpdateDone = false;
+    private Map<GearTier, Map<String, Set<Integer>>> loadedGearData = new EnumMap<>(GearTier.class);
 
 
     @Override
     protected void startUp() throws Exception {
         log.info("Relic Hunter Helper starting up...");
+        loadItemData();
         panel = new RelicHunterPanel(this, config);
         final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "/clue_scroll.png");
         navButton = NavigationButton.builder()
@@ -64,21 +85,61 @@ public class RelicHunterPlugin extends Plugin
                 .panel(panel)
                 .build();
         clientToolbar.addNavigation(navButton);
-        initialPanelUpdateDone = false; // Ensure updates happen on first login after startup
+        overlayManager.add(itemRestrictionOverlay);
+        overlayManager.add(skillTabOverlay);
+        initialPanelUpdateDone = false;
         log.info("Relic Hunter Helper startup complete.");
     }
 
     @Override
     protected void shutDown() throws Exception {
         log.info("Relic Hunter Helper stopped!");
+        overlayManager.remove(itemRestrictionOverlay);
+        overlayManager.remove(skillTabOverlay);
+        loadedGearData.clear();
         clientToolbar.removeNavigation(navButton);
         if (panel != null) { panel.shutdown(); }
         panel = null;
         navButton = null;
     }
 
-    // --- Relic Activation Logic ---
+    /**
+     * Loads and parses the item restriction data from the JSON file.
+     */
+    private void loadItemData() {
+        log.info("Loading item restriction data from JSON...");
+        loadedGearData = new EnumMap<>(GearTier.class);
+        try (InputStream is = getClass().getResourceAsStream(ITEM_DATA_JSON_PATH)) {
+            if (is == null) {
+                log.error("Could not find item data JSON file at path: {}", ITEM_DATA_JSON_PATH);
+                return;
+            }
+            InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8);
+            Type dataType = new TypeToken<ItemDataRoot>(){}.getType();
+            ItemDataRoot parsedData = gson.fromJson(reader, dataType);
 
+            if (parsedData != null && parsedData.getGearTiers() != null) {
+                parsedData.getGearTiers().forEach((tierName, tierContent) -> {
+                    GearTier gearTier = GearTier.fromEnumName(tierName);
+                    if (gearTier != GearTier.NONE) {
+                        Map<String, Set<Integer>> categoryMap = new HashMap<>();
+                        categoryMap.put("weapons", tierContent.getWeapons() != null ? tierContent.getWeapons() : Collections.emptySet());
+                        categoryMap.put("armour", tierContent.getArmour() != null ? tierContent.getArmour() : Collections.emptySet());
+                        loadedGearData.put(gearTier, categoryMap);
+                    } else {
+                        log.warn("Skipping unknown gear tier found in JSON: {}", tierName);
+                    }
+                });
+                log.info("Successfully loaded item data for {} gear tiers.", loadedGearData.size());
+            } else {
+                log.error("Parsed item data or gearTiers map was null.");
+            }
+        } catch (Exception e) {
+            log.error("Error loading or parsing item data JSON", e);
+        }
+    }
+
+    // --- Relic Activation Logic ---
     public void initiateActivationSequence() {
         log.debug("Initiating activation sequence...");
         Map<RelicType, Map<SkillTier, Integer>> availableRelics = getAvailableRelicCounts();
@@ -119,7 +180,7 @@ public class RelicHunterPlugin extends Plugin
                                 () -> log.error("Could not match selected option '{}'", selectedOption)
                         );
             } else {
-                clearChoiceArea(); // Clear panel if user cancels
+                clearChoiceArea();
             }
         });
     }
@@ -174,11 +235,12 @@ public class RelicHunterPlugin extends Plugin
             }
         }
         if (!isGearTierUnlock) {
+            // Loop excludes ATTACK, STRENGTH, DEFENCE, HITPOINTS, OVERALL
             for (Skill skill : Skill.values()) {
-                if (skill == Skill.OVERALL || skill == Skill.ATTACK || skill == Skill.STRENGTH || skill == Skill.DEFENCE) continue;
+                if (skill == Skill.OVERALL || skill == Skill.ATTACK || skill == Skill.STRENGTH || skill == Skill.DEFENCE || skill == Skill.HITPOINTS) continue;
                 for (SkillTier tierValue : SkillTier.values()) {
                     if (tierValue != SkillTier.LOCKED && chosenUnlock.getId().equals(UnlockManager.getSkillTierId(skill, tierValue))) {
-                        setSkillTier(skill, tierValue); break; // Assume only one skill tier match per ID
+                        setSkillTier(skill, tierValue); break;
                     }
                 }
             }
@@ -191,26 +253,55 @@ public class RelicHunterPlugin extends Plugin
         sendChatMessage(message);
     }
 
+
     // --- Helper Methods ---
+
+    public boolean isMeleeItemAllowed(int itemId) {
+        GearTier allowedTier = getMeleeGearTier();
+        for (GearTier checkTier : GearTier.values()) {
+            if (checkTier.ordinal() > allowedTier.ordinal()) continue;
+            if (checkTier == GearTier.NONE) continue;
+            Map<String, Set<Integer>> tierCategories = loadedGearData.get(checkTier);
+            if (tierCategories != null) {
+                if ((tierCategories.get("weapons") != null && tierCategories.get("weapons").contains(itemId)) ||
+                        (tierCategories.get("armour") != null && tierCategories.get("armour").contains(itemId))) {
+                    return true;
+                }
+            }
+        }
+        for (GearTier checkTier : GearTier.values()) {
+            if (checkTier.ordinal() > allowedTier.ordinal()) {
+                Map<String, Set<Integer>> tierCategories = loadedGearData.get(checkTier);
+                if (tierCategories != null) {
+                    if ((tierCategories.get("weapons") != null && tierCategories.get("weapons").contains(itemId)) ||
+                            (tierCategories.get("armour") != null && tierCategories.get("armour").contains(itemId))) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     private int getRelicCount(RelicType type, SkillTier tier) {
         switch (type) {
             case SKILLING:
                 switch (tier) {
                     case APPRENTICE: return config.skillingRelicsApprentice();
                     case JOURNEYMAN: return config.skillingRelicsJourneyman();
-                    default: return 0; // TODO: Higher tiers
+                    default: return 0;
                 }
             case COMBAT:
                 switch (tier) {
                     case APPRENTICE: return config.combatRelicsApprentice();
                     case JOURNEYMAN: return config.combatRelicsJourneyman();
-                    default: return 0; // TODO: Higher tiers
+                    default: return 0;
                 }
             case EXPLORATION:
                 switch (tier) {
                     case APPRENTICE: return config.explorationRelicsApprentice();
                     case JOURNEYMAN: return config.explorationRelicsJourneyman();
-                    default: return 0; // TODO: Higher tiers
+                    default: return 0;
                 }
             default: return 0;
         }
@@ -243,19 +334,16 @@ public class RelicHunterPlugin extends Plugin
                 switch (tier) {
                     case APPRENTICE: return "skillingRelicsApprentice";
                     case JOURNEYMAN: return "skillingRelicsJourneyman";
-                    // TODO: Higher tiers
                 } break;
             case COMBAT:
                 switch (tier) {
                     case APPRENTICE: return "combatRelicsApprentice";
                     case JOURNEYMAN: return "combatRelicsJourneyman";
-                    // TODO: Higher tiers
                 } break;
             case EXPLORATION:
                 switch (tier) {
                     case APPRENTICE: return "explorationRelicsApprentice";
                     case JOURNEYMAN: return "explorationRelicsJourneyman";
-                    // TODO: Higher tiers
                 } break;
         }
         return null;
@@ -266,8 +354,16 @@ public class RelicHunterPlugin extends Plugin
         Player localPlayer = client.getLocalPlayer();
         String playerName = (localPlayer != null) ? localPlayer.getName() : "RelicHunter";
         if (playerName == null) playerName = "RelicHunter";
-        client.addChatMessage(ChatMessageType.GAMEMESSAGE, playerName, message, null);
-        log.info("Chat message sent: {}", message);
+
+        final String finalPlayerName = playerName;
+        clientThread.invoke(() -> {
+            if (client.getGameState() == GameState.LOGGED_IN) {
+                client.addChatMessage(ChatMessageType.GAMEMESSAGE, finalPlayerName, message, null);
+                log.info("Chat message sent via ClientThread: {}", message);
+            } else {
+                log.warn("ClientThread invoked, but player no longer logged in. Message not sent.");
+            }
+        });
     }
 
     private void resetProgression() {
@@ -285,12 +381,11 @@ public class RelicHunterPlugin extends Plugin
                 configManager.setConfiguration(CONFIG_GROUP, "combatRelicsJourneyman", 0);
                 configManager.setConfiguration(CONFIG_GROUP, "explorationRelicsApprentice", 0);
                 configManager.setConfiguration(CONFIG_GROUP, "explorationRelicsJourneyman", 0);
-                // TODO: Reset higher tiers
-                setMeleeGearTier(GearTier.BASIC);
+                setMeleeGearTier(GearTier.STEEL); // Reset to STEEL
                 for (Skill skill : Skill.values()) {
-                    if (skill == Skill.OVERALL || skill == Skill.ATTACK || skill == Skill.STRENGTH || skill == Skill.DEFENCE) continue;
+                    if (skill == Skill.OVERALL || skill == Skill.ATTACK || skill == Skill.STRENGTH || skill == Skill.DEFENCE || skill == Skill.HITPOINTS) continue;
                     SkillTier defaultTier = SkillTier.LOCKED;
-                    if (skill == Skill.HITPOINTS || skill == Skill.MINING || skill == Skill.SMITHING) {
+                    if (skill == Skill.MINING || skill == Skill.SMITHING) {
                         defaultTier = SkillTier.APPRENTICE;
                     }
                     setSkillTier(skill, defaultTier);
@@ -304,10 +399,15 @@ public class RelicHunterPlugin extends Plugin
     }
 
     public SkillTier getSkillTier(Skill skill) {
+        // Return GRANDMASTER for melee/hp as they aren't level capped by SkillTier
+        if (skill == Skill.ATTACK || skill == Skill.STRENGTH || skill == Skill.DEFENCE || skill == Skill.HITPOINTS) {
+            return SkillTier.GRANDMASTER;
+        }
+        // Return configured tier for other skills
         switch (skill) {
             case RANGED: return config.rangedTier(); case PRAYER: return config.prayerTier();
             case MAGIC: return config.magicTier(); case RUNECRAFT: return config.runecraftTier();
-            case CONSTRUCTION: return config.constructionTier(); case HITPOINTS: return config.hitpointsTier();
+            case CONSTRUCTION: return config.constructionTier();
             case AGILITY: return config.agilityTier(); case HERBLORE: return config.herbloreTier();
             case THIEVING: return config.thievingTier(); case CRAFTING: return config.craftingTier();
             case FLETCHING: return config.fletchingTier(); case SLAYER: return config.slayerTier();
@@ -315,7 +415,7 @@ public class RelicHunterPlugin extends Plugin
             case SMITHING: return config.smithingTier(); case FISHING: return config.fishingTier();
             case COOKING: return config.cookingTier(); case FIREMAKING: return config.firemakingTier();
             case WOODCUTTING: return config.woodcuttingTier(); case FARMING: return config.farmingTier();
-            default: return SkillTier.LOCKED;
+            default: return SkillTier.LOCKED; // Default for OVERALL or any unexpected skill
         }
     }
 
@@ -324,7 +424,7 @@ public class RelicHunterPlugin extends Plugin
         switch (skill) {
             case RANGED: key = "rangedTier"; break; case PRAYER: key = "prayerTier"; break;
             case MAGIC: key = "magicTier"; break; case RUNECRAFT: key = "runecraftTier"; break;
-            case CONSTRUCTION: key = "constructionTier"; break; case HITPOINTS: key = "hitpointsTier"; break;
+            case CONSTRUCTION: key = "constructionTier"; break;
             case AGILITY: key = "agilityTier"; break; case HERBLORE: key = "herbloreTier"; break;
             case THIEVING: key = "thievingTier"; break; case CRAFTING: key = "craftingTier"; break;
             case FLETCHING: key = "fletchingTier"; break; case SLAYER: key = "slayerTier"; break;
@@ -332,6 +432,7 @@ public class RelicHunterPlugin extends Plugin
             case SMITHING: key = "smithingTier"; break; case FISHING: key = "fishingTier"; break;
             case COOKING: key = "cookingTier"; break; case FIREMAKING: key = "firemakingTier"; break;
             case WOODCUTTING: key = "woodcuttingTier"; break; case FARMING: key = "farmingTier"; break;
+            // Excluded Atk, Str, Def, HP
             default: return;
         }
         configManager.setConfiguration(CONFIG_GROUP, key, tier);
@@ -340,6 +441,7 @@ public class RelicHunterPlugin extends Plugin
     public GearTier getMeleeGearTier() { return config.meleeGearTier(); }
     private void setMeleeGearTier(GearTier tier) { configManager.setConfiguration(CONFIG_GROUP, "meleeGearTier", tier); }
     private void clearChoiceArea() { if (panel != null) panel.clearChoiceDisplay(); }
+
 
     // --- Event Subscribers ---
     @Subscribe
@@ -364,10 +466,10 @@ public class RelicHunterPlugin extends Plugin
                 panel.updateRelicCounts(); panel.updateUnlockedDisplay(); panel.updateProgressionTiersDisplay();
                 initialPanelUpdateDone = true;
             } else if (panel != null) {
-                panel.clearChoiceDisplay(); // Clear choices on subsequent logins/hops too
+                panel.clearChoiceDisplay();
             }
         } else if (client.getGameState() == GameState.LOGIN_SCREEN || client.getGameState() == GameState.HOPPING) {
-            initialPanelUpdateDone = false; // Reset flag on logout/hop
+            initialPanelUpdateDone = false;
         }
     }
 
