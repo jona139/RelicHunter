@@ -19,6 +19,13 @@ public interface RelicHunterConfig extends Config
     // --- Sections ---
 
     @ConfigSection(
+            name = "General",
+            description = "General plugin settings.",
+            position = -2 // Place at the very top
+    )
+    String generalSection = "general";
+
+    @ConfigSection(
             name = "Relic Counts",
             description = "Tracks the number of each Relic type and tier currently held.",
             position = 0,
@@ -67,6 +74,16 @@ public interface RelicHunterConfig extends Config
             closedByDefault = true
     )
     String managementSection = "management";
+
+    // --- General Settings ---
+    @ConfigItem(
+            keyName = "useF2PDatabase",
+            name = "Use F2P Unlock Database",
+            description = "Check this box to use the F2P unlock database. Uncheck for the default (P2P) database. Requires plugin restart or reload.",
+            position = -1, // Top of General section
+            section = generalSection
+    )
+    default boolean useF2PDatabase() { return false; } // Default to P2P database
 
 
     // --- Tiered Relic Counts ---

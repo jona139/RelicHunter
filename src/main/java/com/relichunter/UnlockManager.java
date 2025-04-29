@@ -10,6 +10,7 @@ import net.runelite.api.Skill; // Keep Skill import
 
 import javax.inject.Inject;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,40 +60,69 @@ public class UnlockManager {
         Map<Integer, String> newSpecificItemCache = new ConcurrentHashMap<>();
         Map<Integer, Set<String>> newGearTierCache = new ConcurrentHashMap<>();
 
-        for (UnlockData unlock : loadedUnlocks) {
-            if (unlock.getId() == null || unlock.getId().isBlank()) {
-                log.warn("Skipping unlock with missing or blank ID: {}", unlock.getName());
-                continue;
-            }
-            if (newDatabase.containsKey(unlock.getId())) {
-                log.warn("Duplicate Unlock ID detected! Skipping duplicate entry for ID: {}", unlock.getId());
-                continue;
-            }
+        // *** Enhanced Loop for Debugging ***
+        for (int i = 0; i < loadedUnlocks.size(); i++) {
+            UnlockData unlock = loadedUnlocks.get(i);
+            String currentId = "UNKNOWN_ID_AT_INDEX_" + i; // Default ID for logging if unlock or its ID is null
 
-            newDatabase.put(unlock.getId(), unlock);
+            try {
+                if (unlock == null) {
+                    log.error("Encountered a null UnlockData object in the loaded list at index {}! Skipping.", i);
+                    continue;
+                }
+                currentId = unlock.getId(); // Get ID early
 
-            // Populate prerequisite cache
-            newPrereqCache.put(unlock.getId(), unlock.getPrerequisites() != null ? Set.copyOf(unlock.getPrerequisites()) : Collections.emptySet());
+                if (currentId == null || currentId.isBlank()) {
+                    log.warn("Skipping unlock at index {} with missing or blank ID (Name: {}).", i, unlock.getName());
+                    continue;
+                }
+                if (newDatabase.containsKey(currentId)) {
+                    log.warn("Duplicate Unlock ID detected! Skipping duplicate entry for ID: {} at index {}.", currentId, i);
+                    continue;
+                }
 
-            // Populate item caches
-            if (unlock.getItemIds() != null && !unlock.getItemIds().isEmpty()) {
-                if (unlock.getCategory() == UnlockType.SPECIFIC_ITEM) {
-                    for (Integer itemId : unlock.getItemIds()) {
-                        // Warn if an item is defined in multiple SPECIFIC_ITEM unlocks (usually shouldn't happen)
-                        if (newSpecificItemCache.containsKey(itemId)) {
-                            log.warn("Item ID {} is defined in multiple SPECIFIC_ITEM unlocks ({} and {}). Using the latter.",
-                                    itemId, newSpecificItemCache.get(itemId), unlock.getId());
+                // *** More Detailed Logging ***
+                SkillTier parsedTier = unlock.getRequiredTier(); // Get the tier parsed by Gson
+                log.trace("Processing index: {}, Unlock ID: {}. Parsed requiredTier by Gson: {}", i, currentId, parsedTier);
+
+                // *** Line 64 Check (where the error occurs) ***
+                if (parsedTier == null) {
+                    log.error(">>> NullPointerException about to occur! Unlock ID {} (at index {}) has a null requiredTier field after Gson parsing! Check the JSON entry for this ID. Skipping this entry.", currentId, i);
+                    // You could add more details here if UnlockData has the raw JSON string stored, e.g.:
+                    // log.error("Problematic JSON snippet (if available): {}", unlock.getRawJsonSnippet());
+                    continue; // Skip this invalid entry
+                }
+                // *** End of Detailed Logging ***
+
+                // If we reach here, parsedTier is not null
+                newDatabase.put(currentId, unlock);
+
+                // Populate prerequisite cache
+                newPrereqCache.put(currentId, unlock.getPrerequisites() != null ? Set.copyOf(unlock.getPrerequisites()) : Collections.emptySet());
+
+                // Populate item caches
+                if (unlock.getItemIds() != null && !unlock.getItemIds().isEmpty()) {
+                    if (unlock.getCategory() == UnlockType.SPECIFIC_ITEM) {
+                        for (Integer itemId : unlock.getItemIds()) {
+                            if (newSpecificItemCache.containsKey(itemId)) {
+                                log.warn("Item ID {} is defined in multiple SPECIFIC_ITEM unlocks ({} and {}). Using the latter.",
+                                        itemId, newSpecificItemCache.get(itemId), currentId);
+                            }
+                            newSpecificItemCache.put(itemId, currentId);
                         }
-                        newSpecificItemCache.put(itemId, unlock.getId());
-                    }
-                } else if (unlock.getCategory() == UnlockType.GEAR_TIER) {
-                    for (Integer itemId : unlock.getItemIds()) {
-                        // Add the gear tier ID to the set for this item
-                        newGearTierCache.computeIfAbsent(itemId, k -> ConcurrentHashMap.newKeySet()).add(unlock.getId());
+                    } else if (unlock.getCategory() == UnlockType.GEAR_TIER) {
+                        for (Integer itemId : unlock.getItemIds()) {
+                            newGearTierCache.computeIfAbsent(itemId, k -> ConcurrentHashMap.newKeySet()).add(currentId);
+                        }
                     }
                 }
+            } catch (Exception e) {
+                // Catch any unexpected exception during the processing of a single unlock
+                log.error("Unexpected exception processing unlock with ID '{}' (at index {}):", currentId, i, e);
+                // Continue to the next unlock if possible
             }
-        }
+        } // End of for loop
+
 
         this.unlockDatabase = newDatabase;
         this.prerequisiteCache = newPrereqCache;
@@ -129,7 +159,7 @@ public class UnlockManager {
     public List<UnlockData> getPotentialUnlocks(RelicType type, SkillTier tier) {
         return unlockDatabase.values().stream()
                 .filter(unlock -> unlock.getRelicType() == type)
-                .filter(unlock -> unlock.getRequiredTier() == tier)
+                .filter(unlock -> unlock.getRequiredTier() == tier) // Direct enum comparison
                 .collect(Collectors.toList());
     }
 
@@ -164,26 +194,50 @@ public class UnlockManager {
         if (specificUnlockId != null) {
             log.trace("Item {} found specific unlock ID {}. Checking if unlocked...", itemId, specificUnlockId);
             // If a specific unlock exists for this item, permission depends *only* on whether that specific unlock is active.
-            return currentlyUnlockedIds.contains(specificUnlockId);
+            boolean permitted = currentlyUnlockedIds.contains(specificUnlockId);
+            log.trace("Item {} specific unlock {} {} unlocked.", itemId, specificUnlockId, permitted ? "IS" : "IS NOT");
+            return permitted;
         }
 
         // 2. Check GEAR_TIER unlock cache
         Set<String> relevantGearTierIds = itemGearTierUnlockIdsCache.get(itemId);
         if (relevantGearTierIds != null && !relevantGearTierIds.isEmpty()) {
-            log.trace("Item {} found in gear tiers: {}. Checking if any are unlocked...", itemId, relevantGearTierIds);
-            // If the item is part of any gear tier definition, it's permitted if *at least one* of those tiers is unlocked.
-            // This assumes the itemIds in the JSON for GEAR_TIER are cumulative (e.g., Mithril includes Steel).
-            // If they are tier-specific, this logic needs changing to find the *lowest* tier the item belongs to
-            // and check if that tier *or higher* is unlocked.
-            for (String gearTierId : relevantGearTierIds) {
-                if (currentlyUnlockedIds.contains(gearTierId)) {
-                    log.trace("Item {} permitted by unlocked gear tier {}", itemId, gearTierId);
-                    return true; // Permitted by at least one unlocked gear tier
-                }
+            log.trace("Item {} found in gear tiers: {}.", itemId, relevantGearTierIds);
+
+            // Find the *minimum* required SkillTier among all gear tiers this item belongs to.
+            SkillTier minimumRequiredTier = relevantGearTierIds.stream()
+                    .map(this::getUnlockById) // Get UnlockData for each tier ID
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .map(UnlockData::getRequiredTier) // Get the SkillTier required for that unlock
+                    .filter(java.util.Objects::nonNull) // Ensure tier is not null
+                    .min(Comparator.comparing(SkillTier::ordinal)) // Find the lowest tier (based on enum order)
+                    .orElse(null); // Should not happen if cache is populated correctly, but handle defensively
+
+            if (minimumRequiredTier == null) {
+                log.error("Could not determine minimum required tier for item {} despite being in gear tier cache {}. Assuming restricted.", itemId, relevantGearTierIds);
+                return false; // Treat as restricted if we can't determine the minimum requirement
             }
-            // If the item was found in gear tiers, but none of them are unlocked, it's restricted.
-            log.trace("Item {} found in gear tiers, but none are unlocked. Item restricted.", itemId);
-            return false;
+
+            log.trace("Item {} minimum required SkillTier determined as: {}", itemId, minimumRequiredTier);
+
+            // Check if *any* currently unlocked gear tier is >= the minimum required tier.
+            boolean hasSufficientTierUnlocked = currentlyUnlockedIds.stream()
+                    .map(this::getUnlockById)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .filter(ud -> ud.getCategory() == UnlockType.GEAR_TIER) // Only consider unlocked GEAR_TIERs
+                    .map(UnlockData::getRequiredTier)
+                    .filter(java.util.Objects::nonNull)
+                    .anyMatch(unlockedTier -> unlockedTier.ordinal() >= minimumRequiredTier.ordinal()); // Check if unlocked tier is >= minimum required
+
+            if (hasSufficientTierUnlocked) {
+                log.trace("Item {} permitted because a gear tier >= {} is unlocked.", itemId, minimumRequiredTier);
+                return true;
+            } else {
+                log.trace("Item {} restricted because no unlocked gear tier is >= {}.", itemId, minimumRequiredTier);
+                return false;
+            }
         }
 
         // 3. Default: Item not found in specific unlocks or gear tiers - assume permitted.
@@ -200,14 +254,20 @@ public class UnlockManager {
         if (tier == SkillTier.LOCKED) { log.warn("Attempted to generate Skill Tier ID for LOCKED state."); }
         if (skill == null) { log.error("Attempted to generate Skill Tier ID with null skill!"); return "SKILL_NULL_" + (tier != null ? tier.name() : "NULLTIER"); }
         if (skill == Skill.OVERALL) { log.warn("Attempted to generate Skill Tier ID for OVERALL skill."); return "SKILL_OVERALL_" + tier.name(); }
+        // *** MODIFIED: Handle level-based tiers if needed, though JSON uses specific IDs now ***
+        // Example: If using level-based IDs like LEVEL_10, adjust generation here or rely on JSON IDs.
+        // For now, assuming JSON uses tier names like APPRENTICE or specific level IDs.
         return "SKILL_" + skill.getName().toUpperCase() + "_" + tier.name();
     }
 
     /** Helper method to generate Gear Tier Unlock IDs consistently. */
     public static String getGearTierId(GearTier tier) {
         if (tier == null || tier == GearTier.NONE) { log.warn("Attempted to generate Gear Tier ID for null or NONE tier."); return "GEAR_INVALID"; }
-        // Assume a prefix like GEAR_MELEE_ for now, needs refinement
-        return "GEAR_MELEE_" + tier.name(); // TODO: Refine based on actual JSON structure (MELEE/RANGED/MAGIC?)
+        // Assume a prefix like GEAR_MELEE_ for now, needs refinement based on JSON structure
+        // *** TODO: Refine based on actual JSON structure (MELEE/RANGED/MAGIC?) ***
+        // Example: If JSON uses GEAR_RANGED_GREEN_DHIDE, generation needs to match.
+        // For now, assuming JSON uses IDs like GEAR_MELEE_MITHRIL
+        return "GEAR_MELEE_" + tier.name();
     }
 
     // Removed config injection - no longer needed here

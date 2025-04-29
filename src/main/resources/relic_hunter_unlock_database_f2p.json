@@ -1,0 +1,300 @@
+{
+  "unlocks": [
+    // ==================================
+    //        F2P SKILL TIERS (10 Levels)
+    // ==================================
+    // Note: Attack, Strength, Defence, Hitpoints are assumed always unlocked (per plugin logic)
+
+    // --- Mining (Starts partially unlocked) ---
+    { "id": "SKILL_MINING_LEVEL_10", "name": "Mining (Level 10)", "description": "Unlocks Mining up to level 10.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": [] },
+    { "id": "SKILL_MINING_LEVEL_20", "name": "Mining (Level 20)", "description": "Unlocks Mining up to level 20.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_MINING_LEVEL_10"] },
+    { "id": "SKILL_MINING_LEVEL_30", "name": "Mining (Level 30)", "description": "Unlocks Mining up to level 30.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_MINING_LEVEL_20"] },
+    { "id": "SKILL_MINING_LEVEL_40", "name": "Mining (Level 40)", "description": "Unlocks Mining up to level 40.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_MINING_LEVEL_30"] },
+    { "id": "SKILL_MINING_LEVEL_50", "name": "Mining (Level 50)", "description": "Unlocks Mining up to level 50.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_MINING_LEVEL_40"] },
+    { "id": "SKILL_MINING_LEVEL_60", "name": "Mining (Level 60)", "description": "Unlocks Mining up to level 60.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_MINING_LEVEL_50"] },
+    { "id": "SKILL_MINING_LEVEL_70", "name": "Mining (Level 70)", "description": "Unlocks Mining up to level 70.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_MINING_LEVEL_60"] },
+    { "id": "SKILL_MINING_LEVEL_80", "name": "Mining (Level 80)", "description": "Unlocks Mining up to level 80.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_MINING_LEVEL_70"] },
+    { "id": "SKILL_MINING_LEVEL_90", "name": "Mining (Level 90)", "description": "Unlocks Mining up to level 90.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_MINING_LEVEL_80"] },
+    { "id": "SKILL_MINING_LEVEL_99", "name": "Mining (Level 99)", "description": "Unlocks Mining up to level 99.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_MINING_LEVEL_90"] },
+
+    // --- Smithing (Starts partially unlocked) ---
+    { "id": "SKILL_SMITHING_LEVEL_10", "name": "Smithing (Level 10)", "description": "Unlocks Smithing up to level 10.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": [] },
+    { "id": "SKILL_SMITHING_LEVEL_20", "name": "Smithing (Level 20)", "description": "Unlocks Smithing up to level 20.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_SMITHING_LEVEL_10"] },
+    { "id": "SKILL_SMITHING_LEVEL_30", "name": "Smithing (Level 30)", "description": "Unlocks Smithing up to level 30.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_SMITHING_LEVEL_20"] },
+    { "id": "SKILL_SMITHING_LEVEL_40", "name": "Smithing (Level 40)", "description": "Unlocks Smithing up to level 40.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_SMITHING_LEVEL_30"] },
+    { "id": "SKILL_SMITHING_LEVEL_50", "name": "Smithing (Level 50)", "description": "Unlocks Smithing up to level 50.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_SMITHING_LEVEL_40"] },
+    { "id": "SKILL_SMITHING_LEVEL_60", "name": "Smithing (Level 60)", "description": "Unlocks Smithing up to level 60.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_SMITHING_LEVEL_50"] },
+    { "id": "SKILL_SMITHING_LEVEL_70", "name": "Smithing (Level 70)", "description": "Unlocks Smithing up to level 70.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_SMITHING_LEVEL_60"] },
+    { "id": "SKILL_SMITHING_LEVEL_80", "name": "Smithing (Level 80)", "description": "Unlocks Smithing up to level 80.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_SMITHING_LEVEL_70"] },
+    { "id": "SKILL_SMITHING_LEVEL_90", "name": "Smithing (Level 90)", "description": "Unlocks Smithing up to level 90.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_SMITHING_LEVEL_80"] },
+    { "id": "SKILL_SMITHING_LEVEL_99", "name": "Smithing (Level 99)", "description": "Unlocks Smithing up to level 99.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_SMITHING_LEVEL_90"] },
+
+    // --- Fishing (Starts partially unlocked) ---
+    { "id": "SKILL_FISHING_LEVEL_10", "name": "Fishing (Level 10)", "description": "Unlocks Fishing up to level 10.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": [] },
+    { "id": "SKILL_FISHING_LEVEL_20", "name": "Fishing (Level 20)", "description": "Unlocks Fishing up to level 20.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_FISHING_LEVEL_10"] },
+    { "id": "SKILL_FISHING_LEVEL_30", "name": "Fishing (Level 30)", "description": "Unlocks Fishing up to level 30.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_FISHING_LEVEL_20"] },
+    { "id": "SKILL_FISHING_LEVEL_40", "name": "Fishing (Level 40)", "description": "Unlocks Fishing up to level 40.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_FISHING_LEVEL_30"] },
+    { "id": "SKILL_FISHING_LEVEL_50", "name": "Fishing (Level 50)", "description": "Unlocks Fishing up to level 50.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_FISHING_LEVEL_40"] },
+    { "id": "SKILL_FISHING_LEVEL_60", "name": "Fishing (Level 60)", "description": "Unlocks Fishing up to level 60.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_FISHING_LEVEL_50"] },
+    { "id": "SKILL_FISHING_LEVEL_70", "name": "Fishing (Level 70)", "description": "Unlocks Fishing up to level 70.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_FISHING_LEVEL_60"] },
+    { "id": "SKILL_FISHING_LEVEL_80", "name": "Fishing (Level 80)", "description": "Unlocks Fishing up to level 80.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_FISHING_LEVEL_70"] },
+    { "id": "SKILL_FISHING_LEVEL_90", "name": "Fishing (Level 90)", "description": "Unlocks Fishing up to level 90.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_FISHING_LEVEL_80"] },
+    { "id": "SKILL_FISHING_LEVEL_99", "name": "Fishing (Level 99)", "description": "Unlocks Fishing up to level 99.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_FISHING_LEVEL_90"] },
+
+    // --- Cooking (Starts partially unlocked) ---
+    { "id": "SKILL_COOKING_LEVEL_10", "name": "Cooking (Level 10)", "description": "Unlocks Cooking up to level 10.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": [] },
+    { "id": "SKILL_COOKING_LEVEL_20", "name": "Cooking (Level 20)", "description": "Unlocks Cooking up to level 20.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_COOKING_LEVEL_10"] },
+    { "id": "SKILL_COOKING_LEVEL_30", "name": "Cooking (Level 30)", "description": "Unlocks Cooking up to level 30.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_COOKING_LEVEL_20"] },
+    { "id": "SKILL_COOKING_LEVEL_40", "name": "Cooking (Level 40)", "description": "Unlocks Cooking up to level 40.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_COOKING_LEVEL_30"] },
+    { "id": "SKILL_COOKING_LEVEL_50", "name": "Cooking (Level 50)", "description": "Unlocks Cooking up to level 50.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_COOKING_LEVEL_40"] },
+    { "id": "SKILL_COOKING_LEVEL_60", "name": "Cooking (Level 60)", "description": "Unlocks Cooking up to level 60.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_COOKING_LEVEL_50"] },
+    { "id": "SKILL_COOKING_LEVEL_70", "name": "Cooking (Level 70)", "description": "Unlocks Cooking up to level 70.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_COOKING_LEVEL_60"] },
+    { "id": "SKILL_COOKING_LEVEL_80", "name": "Cooking (Level 80)", "description": "Unlocks Cooking up to level 80.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_COOKING_LEVEL_70"] },
+    { "id": "SKILL_COOKING_LEVEL_90", "name": "Cooking (Level 90)", "description": "Unlocks Cooking up to level 90.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_COOKING_LEVEL_80"] },
+    { "id": "SKILL_COOKING_LEVEL_99", "name": "Cooking (Level 99)", "description": "Unlocks Cooking up to level 99.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_COOKING_LEVEL_90"] },
+
+    // --- Woodcutting (Starts partially unlocked) ---
+    { "id": "SKILL_WOODCUTTING_LEVEL_10", "name": "Woodcutting (Level 10)", "description": "Unlocks Woodcutting up to level 10.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": [] },
+    { "id": "SKILL_WOODCUTTING_LEVEL_20", "name": "Woodcutting (Level 20)", "description": "Unlocks Woodcutting up to level 20.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_10"] },
+    { "id": "SKILL_WOODCUTTING_LEVEL_30", "name": "Woodcutting (Level 30)", "description": "Unlocks Woodcutting up to level 30.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_20"] },
+    { "id": "SKILL_WOODCUTTING_LEVEL_40", "name": "Woodcutting (Level 40)", "description": "Unlocks Woodcutting up to level 40.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_30"] },
+    { "id": "SKILL_WOODCUTTING_LEVEL_50", "name": "Woodcutting (Level 50)", "description": "Unlocks Woodcutting up to level 50.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_40"] },
+    { "id": "SKILL_WOODCUTTING_LEVEL_60", "name": "Woodcutting (Level 60)", "description": "Unlocks Woodcutting up to level 60.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_50"] },
+    { "id": "SKILL_WOODCUTTING_LEVEL_70", "name": "Woodcutting (Level 70)", "description": "Unlocks Woodcutting up to level 70.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_60"] },
+    { "id": "SKILL_WOODCUTTING_LEVEL_80", "name": "Woodcutting (Level 80)", "description": "Unlocks Woodcutting up to level 80.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_70"] },
+    { "id": "SKILL_WOODCUTTING_LEVEL_90", "name": "Woodcutting (Level 90)", "description": "Unlocks Woodcutting up to level 90.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_80"] },
+    { "id": "SKILL_WOODCUTTING_LEVEL_99", "name": "Woodcutting (Level 99)", "description": "Unlocks Woodcutting up to level 99.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_90"] },
+
+    // --- Firemaking (Starts partially unlocked) ---
+    { "id": "SKILL_FIREMAKING_LEVEL_10", "name": "Firemaking (Level 10)", "description": "Unlocks Firemaking up to level 10.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": [] },
+    { "id": "SKILL_FIREMAKING_LEVEL_20", "name": "Firemaking (Level 20)", "description": "Unlocks Firemaking up to level 20.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_FIREMAKING_LEVEL_10"] },
+    { "id": "SKILL_FIREMAKING_LEVEL_30", "name": "Firemaking (Level 30)", "description": "Unlocks Firemaking up to level 30.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_FIREMAKING_LEVEL_20"] },
+    { "id": "SKILL_FIREMAKING_LEVEL_40", "name": "Firemaking (Level 40)", "description": "Unlocks Firemaking up to level 40.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_FIREMAKING_LEVEL_30"] },
+    { "id": "SKILL_FIREMAKING_LEVEL_50", "name": "Firemaking (Level 50)", "description": "Unlocks Firemaking up to level 50.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_FIREMAKING_LEVEL_40"] },
+    { "id": "SKILL_FIREMAKING_LEVEL_60", "name": "Firemaking (Level 60)", "description": "Unlocks Firemaking up to level 60.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_FIREMAKING_LEVEL_50"] },
+    { "id": "SKILL_FIREMAKING_LEVEL_70", "name": "Firemaking (Level 70)", "description": "Unlocks Firemaking up to level 70.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_FIREMAKING_LEVEL_60"] },
+    { "id": "SKILL_FIREMAKING_LEVEL_80", "name": "Firemaking (Level 80)", "description": "Unlocks Firemaking up to level 80.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_FIREMAKING_LEVEL_70"] },
+    { "id": "SKILL_FIREMAKING_LEVEL_90", "name": "Firemaking (Level 90)", "description": "Unlocks Firemaking up to level 90.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_FIREMAKING_LEVEL_80"] },
+    { "id": "SKILL_FIREMAKING_LEVEL_99", "name": "Firemaking (Level 99)", "description": "Unlocks Firemaking up to level 99.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_FIREMAKING_LEVEL_90"] },
+
+    // --- Crafting (Starts locked) ---
+    { "id": "SKILL_CRAFTING_LEVEL_10", "name": "Crafting (Level 10)", "description": "Unlocks Crafting up to level 10.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": [] },
+    { "id": "SKILL_CRAFTING_LEVEL_20", "name": "Crafting (Level 20)", "description": "Unlocks Crafting up to level 20.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_CRAFTING_LEVEL_10"] },
+    { "id": "SKILL_CRAFTING_LEVEL_30", "name": "Crafting (Level 30)", "description": "Unlocks Crafting up to level 30.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_CRAFTING_LEVEL_20"] },
+    { "id": "SKILL_CRAFTING_LEVEL_40", "name": "Crafting (Level 40)", "description": "Unlocks Crafting up to level 40.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_CRAFTING_LEVEL_30"] },
+    { "id": "SKILL_CRAFTING_LEVEL_50", "name": "Crafting (Level 50)", "description": "Unlocks Crafting up to level 50.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_CRAFTING_LEVEL_40"] },
+    { "id": "SKILL_CRAFTING_LEVEL_60", "name": "Crafting (Level 60)", "description": "Unlocks Crafting up to level 60.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_CRAFTING_LEVEL_50"] },
+    { "id": "SKILL_CRAFTING_LEVEL_70", "name": "Crafting (Level 70)", "description": "Unlocks Crafting up to level 70.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_CRAFTING_LEVEL_60"] },
+    { "id": "SKILL_CRAFTING_LEVEL_80", "name": "Crafting (Level 80)", "description": "Unlocks Crafting up to level 80.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_CRAFTING_LEVEL_70"] },
+    { "id": "SKILL_CRAFTING_LEVEL_90", "name": "Crafting (Level 90)", "description": "Unlocks Crafting up to level 90.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_CRAFTING_LEVEL_80"] },
+    { "id": "SKILL_CRAFTING_LEVEL_99", "name": "Crafting (Level 99)", "description": "Unlocks Crafting up to level 99.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_CRAFTING_LEVEL_90"] },
+
+    // --- Runecraft (Starts locked, requires Rune Mysteries) ---
+    { "id": "SKILL_RUNECRAFT_LEVEL_10", "name": "Runecraft (Level 10)", "description": "Unlocks Runecraft up to level 10.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["QUEST_RUNE_MYSTERIES"] },
+    { "id": "SKILL_RUNECRAFT_LEVEL_20", "name": "Runecraft (Level 20)", "description": "Unlocks Runecraft up to level 20.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_RUNECRAFT_LEVEL_10"] },
+    { "id": "SKILL_RUNECRAFT_LEVEL_30", "name": "Runecraft (Level 30)", "description": "Unlocks Runecraft up to level 30.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_RUNECRAFT_LEVEL_20"] },
+    { "id": "SKILL_RUNECRAFT_LEVEL_40", "name": "Runecraft (Level 40)", "description": "Unlocks Runecraft up to level 40.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_RUNECRAFT_LEVEL_30"] },
+    { "id": "SKILL_RUNECRAFT_LEVEL_50", "name": "Runecraft (Level 50)", "description": "Unlocks Runecraft up to level 50.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_RUNECRAFT_LEVEL_40"] },
+    { "id": "SKILL_RUNECRAFT_LEVEL_60", "name": "Runecraft (Level 60)", "description": "Unlocks Runecraft up to level 60.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_RUNECRAFT_LEVEL_50"] },
+    { "id": "SKILL_RUNECRAFT_LEVEL_70", "name": "Runecraft (Level 70)", "description": "Unlocks Runecraft up to level 70.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_RUNECRAFT_LEVEL_60"] },
+    { "id": "SKILL_RUNECRAFT_LEVEL_80", "name": "Runecraft (Level 80)", "description": "Unlocks Runecraft up to level 80.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_RUNECRAFT_LEVEL_70"] },
+    { "id": "SKILL_RUNECRAFT_LEVEL_90", "name": "Runecraft (Level 90)", "description": "Unlocks Runecraft up to level 90.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_RUNECRAFT_LEVEL_80"] },
+    { "id": "SKILL_RUNECRAFT_LEVEL_99", "name": "Runecraft (Level 99)", "description": "Unlocks Runecraft up to level 99.", "category": "SKILL_TIER", "relicType": "SKILLING", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_RUNECRAFT_LEVEL_90"] },
+
+    // --- Prayer (Starts locked) ---
+    { "id": "SKILL_PRAYER_LEVEL_10", "name": "Prayer (Level 10)", "description": "Unlocks Prayer up to level 10.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": [] },
+    { "id": "SKILL_PRAYER_LEVEL_20", "name": "Prayer (Level 20)", "description": "Unlocks Prayer up to level 20.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_PRAYER_LEVEL_10"] },
+    { "id": "SKILL_PRAYER_LEVEL_30", "name": "Prayer (Level 30)", "description": "Unlocks Prayer up to level 30.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_PRAYER_LEVEL_20"] },
+    { "id": "SKILL_PRAYER_LEVEL_40", "name": "Prayer (Level 40)", "description": "Unlocks Prayer up to level 40.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_PRAYER_LEVEL_30"] },
+    { "id": "SKILL_PRAYER_LEVEL_50", "name": "Prayer (Level 50)", "description": "Unlocks Prayer up to level 50.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "EXPERT", "prerequisites": ["SKILL_PRAYER_LEVEL_40"] },
+    { "id": "SKILL_PRAYER_LEVEL_60", "name": "Prayer (Level 60)", "description": "Unlocks Prayer up to level 60.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "EXPERT", "prerequisites": ["SKILL_PRAYER_LEVEL_50"] },
+    { "id": "SKILL_PRAYER_LEVEL_70", "name": "Prayer (Level 70)", "description": "Unlocks Prayer up to level 70.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "MASTER", "prerequisites": ["SKILL_PRAYER_LEVEL_60"] },
+    { "id": "SKILL_PRAYER_LEVEL_80", "name": "Prayer (Level 80)", "description": "Unlocks Prayer up to level 80.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "MASTER", "prerequisites": ["SKILL_PRAYER_LEVEL_70"] },
+    { "id": "SKILL_PRAYER_LEVEL_90", "name": "Prayer (Level 90)", "description": "Unlocks Prayer up to level 90.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_PRAYER_LEVEL_80"] },
+    { "id": "SKILL_PRAYER_LEVEL_99", "name": "Prayer (Level 99)", "description": "Unlocks Prayer up to level 99.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_PRAYER_LEVEL_90"] },
+
+    // --- Magic (Starts locked) ---
+    { "id": "SKILL_MAGIC_LEVEL_10", "name": "Magic (Level 10)", "description": "Unlocks Magic up to level 10.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": [] },
+    { "id": "SKILL_MAGIC_LEVEL_20", "name": "Magic (Level 20)", "description": "Unlocks Magic up to level 20.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_MAGIC_LEVEL_10"] },
+    { "id": "SKILL_MAGIC_LEVEL_30", "name": "Magic (Level 30)", "description": "Unlocks Magic up to level 30.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_MAGIC_LEVEL_20"] },
+    { "id": "SKILL_MAGIC_LEVEL_40", "name": "Magic (Level 40)", "description": "Unlocks Magic up to level 40.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_MAGIC_LEVEL_30"] },
+    { "id": "SKILL_MAGIC_LEVEL_50", "name": "Magic (Level 50)", "description": "Unlocks Magic up to level 50.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "EXPERT", "prerequisites": ["SKILL_MAGIC_LEVEL_40"] },
+    { "id": "SKILL_MAGIC_LEVEL_60", "name": "Magic (Level 60)", "description": "Unlocks Magic up to level 60.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "EXPERT", "prerequisites": ["SKILL_MAGIC_LEVEL_50"] },
+    { "id": "SKILL_MAGIC_LEVEL_70", "name": "Magic (Level 70)", "description": "Unlocks Magic up to level 70.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "MASTER", "prerequisites": ["SKILL_MAGIC_LEVEL_60"] },
+    { "id": "SKILL_MAGIC_LEVEL_80", "name": "Magic (Level 80)", "description": "Unlocks Magic up to level 80.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "MASTER", "prerequisites": ["SKILL_MAGIC_LEVEL_70"] },
+    { "id": "SKILL_MAGIC_LEVEL_90", "name": "Magic (Level 90)", "description": "Unlocks Magic up to level 90.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_MAGIC_LEVEL_80"] },
+    { "id": "SKILL_MAGIC_LEVEL_99", "name": "Magic (Level 99)", "description": "Unlocks Magic up to level 99.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_MAGIC_LEVEL_90"] },
+
+    // --- Ranged (Starts locked) ---
+    { "id": "SKILL_RANGED_LEVEL_10", "name": "Ranged (Level 10)", "description": "Unlocks Ranged up to level 10.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": [] },
+    { "id": "SKILL_RANGED_LEVEL_20", "name": "Ranged (Level 20)", "description": "Unlocks Ranged up to level 20.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_RANGED_LEVEL_10"] },
+    { "id": "SKILL_RANGED_LEVEL_30", "name": "Ranged (Level 30)", "description": "Unlocks Ranged up to level 30.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_RANGED_LEVEL_20"] },
+    { "id": "SKILL_RANGED_LEVEL_40", "name": "Ranged (Level 40)", "description": "Unlocks Ranged up to level 40.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_RANGED_LEVEL_30"] },
+    { "id": "SKILL_RANGED_LEVEL_50", "name": "Ranged (Level 50)", "description": "Unlocks Ranged up to level 50.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "EXPERT", "prerequisites": ["SKILL_RANGED_LEVEL_40"] },
+    { "id": "SKILL_RANGED_LEVEL_60", "name": "Ranged (Level 60)", "description": "Unlocks Ranged up to level 60.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "EXPERT", "prerequisites": ["SKILL_RANGED_LEVEL_50"] },
+    { "id": "SKILL_RANGED_LEVEL_70", "name": "Ranged (Level 70)", "description": "Unlocks Ranged up to level 70.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "MASTER", "prerequisites": ["SKILL_RANGED_LEVEL_60"] },
+    { "id": "SKILL_RANGED_LEVEL_80", "name": "Ranged (Level 80)", "description": "Unlocks Ranged up to level 80.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "MASTER", "prerequisites": ["SKILL_RANGED_LEVEL_70"] },
+    { "id": "SKILL_RANGED_LEVEL_90", "name": "Ranged (Level 90)", "description": "Unlocks Ranged up to level 90.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_RANGED_LEVEL_80"] },
+    { "id": "SKILL_RANGED_LEVEL_99", "name": "Ranged (Level 99)", "description": "Unlocks Ranged up to level 99.", "category": "SKILL_TIER", "relicType": "COMBAT", "requiredTier": "GRANDMASTER", "prerequisites": ["SKILL_RANGED_LEVEL_90"] },
+
+
+    // ==================================
+    //        F2P GEAR TIERS
+    // ==================================
+    // Assuming Bronze/Iron are available by default or unlocked via Level 10 Smithing/Mining
+
+    {
+      "id": "GEAR_MELEE_STEEL",
+      "name": "Equip Steel Melee Gear",
+      "description": "Allows equipping Melee armour and weapons up to Steel tier.",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": [],
+      "itemIds": [ 1281, 1325, 1207, 1365, 1311, 1341, 3097, 1353, 3192, 1119, 1069, 1083, 1141, 1157, 1177, 1191, 1105, 4123, 3753 ] // Steel
+    },
+    {
+      "id": "GEAR_MELEE_BLACK",
+      "name": "Equip Black Melee Gear",
+      "description": "Allows equipping Melee armour and weapons up to Black tier.",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": ["GEAR_MELEE_STEEL"],
+      "itemIds": [ 1283, 1327, 1217, 1367, 1313, 1341, 3097, 1353, 3194, 1125, 1077, 1089, 1151, 1165, 1181, 1193, 1111, /* Steel IDs Below */ 1281, 1325, 1207, 1365, 1311, 1341, 3097, 1353, 3192, 1119, 1069, 1083, 1141, 1157, 1177, 1191, 1105, 4123, 3753 ] // Black IDs + Steel
+    },
+    {
+      "id": "GEAR_MELEE_MITHRIL",
+      "name": "Equip Mithril Melee Gear",
+      "description": "Allows equipping Melee armour and weapons up to Mithril tier.",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "JOURNEYMAN", "prerequisites": ["GEAR_MELEE_BLACK"],
+      "itemIds": [ 1285, 1329, 1209, 1369, 1315, 1343, 3098, 1355, 3196, 1241, 1121, 1071, 1085, 1143, 1159, 1179, 1195, 1107, 4125, 3755, /* Black IDs Below */ 1283, 1327, 1217, 1367, 1313, 1341, 3097, 1353, 3194, 1125, 1077, 1089, 1151, 1165, 1181, 1193, 1111, /* Steel IDs Below */ 1281, 1325, 1207, 1365, 1311, 1341, 3097, 1353, 3192, 1119, 1069, 1083, 1141, 1157, 1177, 1191, 1105, 4123, 3753 ] // Mithril IDs + Black + Steel
+    },
+    {
+      "id": "GEAR_MELEE_ADAMANT",
+      "name": "Equip Adamant Melee Gear",
+      "description": "Allows equipping Melee armour and weapons up to Adamant tier.",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "EXPERT", "prerequisites": ["GEAR_MELEE_MITHRIL"],
+      "itemIds": [ 1287, 1331, 1211, 1371, 1317, 1345, 3099, 1357, 3198, 1243, 1123, 1073, 1087, 1145, 1161, 1183, 1199, 1109, 4127, /* Mithril IDs Below */ 1285, 1329, 1209, 1369, 1315, 1343, 3098, 1355, 3196, 1241, 1121, 1071, 1085, 1143, 1159, 1179, 1195, 1107, 4125, 3755, /* Black IDs Below */ 1283, 1327, 1217, 1367, 1313, 1341, 3097, 1353, 3194, 1125, 1077, 1089, 1151, 1165, 1181, 1193, 1111, /* Steel IDs Below */ 1281, 1325, 1207, 1365, 1311, 1341, 3097, 1353, 3192, 1119, 1069, 1083, 1141, 1157, 1177, 1191, 1105, 4123, 3753 ] // Adamant IDs + Mithril + Black + Steel
+    },
+    {
+      "id": "GEAR_MELEE_RUNE",
+      "name": "Equip Rune Melee Gear",
+      "description": "Allows equipping Melee armour and weapons up to Rune tier.",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "MASTER", "prerequisites": ["GEAR_MELEE_ADAMANT"],
+      "itemIds": [ 1289, 1333, 1213, 1373, 1319, 1347, 3101, 1359, 3202, 1247, 1127, 1079, 1093, 1147, 1163, 1185, 1201, 1113, 4131, /* Adamant IDs Below */ 1287, 1331, 1211, 1371, 1317, 1345, 3099, 1357, 3198, 1243, 1123, 1073, 1087, 1145, 1161, 1183, 1199, 1109, 4127, /* Mithril IDs Below */ 1285, 1329, 1209, 1369, 1315, 1343, 3098, 1355, 3196, 1241, 1121, 1071, 1085, 1143, 1159, 1179, 1195, 1107, 4125, 3755, /* Black IDs Below */ 1283, 1327, 1217, 1367, 1313, 1341, 3097, 1353, 3194, 1125, 1077, 1089, 1151, 1165, 1181, 1193, 1111, /* Steel IDs Below */ 1281, 1325, 1207, 1365, 1311, 1341, 3097, 1353, 3192, 1119, 1069, 1083, 1141, 1157, 1177, 1191, 1105, 4123, 3753 ] // Rune IDs + Adamant + Mithril + Black + Steel
+    },
+
+    // Ranged Gear (Simplified for F2P)
+    {
+      "id": "GEAR_RANGED_LEATHER",
+      "name": "Equip Basic Leather/Wood Gear",
+      "description": "Allows equipping Leather armour, Shortbow, Longbow, Wooden Shield.",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": [],
+      "itemIds": [ 1129, 1095, 1063, 1167, 839, 841 ] // Leather body, chaps, vambraces, cowl, Longbow, Shortbow
+    },
+    {
+      "id": "GEAR_RANGED_HARDLEATHER_OAK",
+      "name": "Equip Hard Leather/Oak Gear",
+      "description": "Allows equipping Hard Leather armour, Oak bows.",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": ["GEAR_RANGED_LEATHER"],
+      "itemIds": [ 1131, 1097, 1065, 843, 845, /* Leather IDs Below */ 1129, 1095, 1063, 1167, 839, 841 ] // Hardleather body, chaps, shield, Oak shortbow, Oak longbow + Leather
+    },
+    {
+      "id": "GEAR_RANGED_WILLOW",
+      "name": "Equip Willow Bows",
+      "description": "Allows equipping Willow bows.",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "JOURNEYMAN", "prerequisites": ["GEAR_RANGED_HARDLEATHER_OAK"],
+      "itemIds": [ 847, 849, /* Hard Leather/Oak IDs Below */ 1131, 1097, 1065, 843, 845, /* Leather IDs Below */ 1129, 1095, 1063, 1167, 839, 841 ] // Willow shortbow, Willow longbow + Lower
+    },
+    {
+      "id": "GEAR_RANGED_MAPLE",
+      "name": "Equip Maple Bows",
+      "description": "Allows equipping Maple bows.",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "EXPERT", "prerequisites": ["GEAR_RANGED_WILLOW"],
+      "itemIds": [ 851, 853, /* Willow IDs Below */ 847, 849, /* Hard Leather/Oak IDs Below */ 1131, 1097, 1065, 843, 845, /* Leather IDs Below */ 1129, 1095, 1063, 1167, 839, 841 ] // Maple shortbow, Maple longbow + Lower
+    },
+    {
+      "id": "GEAR_RANGED_GREEN_DHIDE",
+      "name": "Equip Green D'hide Gear",
+      "description": "Allows equipping Green Dragonhide armour (excluding body).",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "MASTER", "prerequisites": ["GEAR_RANGED_MAPLE"],
+      "itemIds": [ 1099, 1065, 1135, /* Maple IDs Below */ 851, 853, /* Willow IDs Below */ 847, 849, /* Hard Leather/Oak IDs Below */ 1131, 1097, 1065, 843, 845, /* Leather IDs Below */ 1129, 1095, 1063, 1167, 839, 841 ] // Green d'hide chaps, vambraces, coif + Lower (Body is members)
+    },
+
+    // Magic Gear (Simplified for F2P)
+    {
+      "id": "GEAR_MAGIC_BASIC_STAFF",
+      "name": "Equip Basic Staves",
+      "description": "Allows equipping Staff, Magic staff, Staff of air/water/earth/fire.",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": [],
+      "itemIds": [ 1379, 1381, 1383, 1385, 1387 ] // Staff, Magic staff, Elemental staves
+    },
+    {
+      "id": "GEAR_MAGIC_ROBES",
+      "name": "Equip Basic Robes",
+      "description": "Allows equipping Wizard robes, Zamorak robes.",
+      "category": "GEAR_TIER", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": ["GEAR_MAGIC_BASIC_STAFF"],
+      "itemIds": [ 577, 579, 1011, 1013, 1015, 1017, 1019, 1021, 1023, 1025, 1027, 1029, 1031, /* Staff IDs Below */ 1379, 1381, 1383, 1385, 1387 ] // Wizard hat, robe top, Zamorak monk top, bottom + Staves
+    },
+
+
+    // ==================================
+    //        F2P SPECIFIC ITEMS
+    // ==================================
+    { "id": "ITEM_AMULET_OF_STRENGTH", "name": "Unlock: Amulet of Strength", "description": "Allows equipping the Amulet of Strength.", "category": "SPECIFIC_ITEM", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_CRAFTING_LEVEL_50"], "itemIds": [1725] },
+    { "id": "ITEM_AMULET_OF_POWER", "name": "Unlock: Amulet of Power", "description": "Allows equipping the Amulet of Power.", "category": "SPECIFIC_ITEM", "relicType": "COMBAT", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_CRAFTING_LEVEL_70"], "itemIds": [1731] },
+    { "id": "ITEM_RUNE_SCIMITAR", "name": "Unlock: Rune Scimitar", "description": "Allows equipping the Rune Scimitar.", "category": "SPECIFIC_ITEM", "relicType": "COMBAT", "requiredTier": "MASTER", "prerequisites": ["GEAR_MELEE_RUNE"], "itemIds": [1333] }, // Note: No quest req in this F2P version
+    { "id": "ITEM_RUNE_PLATEBODY", "name": "Unlock: Rune Platebody", "description": "Allows equipping the Rune Platebody.", "category": "SPECIFIC_ITEM", "relicType": "COMBAT", "requiredTier": "MASTER", "prerequisites": ["GEAR_MELEE_RUNE", "QUEST_DRAGON_SLAYER_I_F2P"], "itemIds": [1127] }, // Requires F2P version of DS1 unlock
+
+
+    // ==================================
+    //        F2P AREAS
+    // ==================================
+    // Assuming Lumbridge/Draynor/Varrock/Falador/Port Sarim/Rimmington/Al Kharid are starting areas
+    { "id": "AREA_KARAMJA_F2P", "name": "Unlock: Karamja (F2P)", "description": "Grants access to the F2P parts of Karamja (Musa Point).", "category": "AREA", "relicType": "EXPLORATION", "requiredTier": "APPRENTICE", "prerequisites": [], "areaDefinition": "REGION_ID:11568" }, // Musa Point region
+    { "id": "AREA_WILDERNESS_LOW_F2P", "name": "Unlock: Low Wilderness (F2P)", "description": "Grants access to the Wilderness up to level 20.", "category": "AREA", "relicType": "EXPLORATION", "requiredTier": "JOURNEYMAN", "prerequisites": [], "areaDefinition": "WILDY_LEVEL:1-20" },
+    { "id": "AREA_EDGEVILLE_DUNGEON", "name": "Unlock: Edgeville Dungeon", "description": "Grants access to the Edgeville Dungeon.", "category": "AREA", "relicType": "EXPLORATION", "requiredTier": "APPRENTICE", "prerequisites": [], "areaDefinition": "REGION_ID:12442" },
+    { "id": "AREA_VARROCK_SEWERS", "name": "Unlock: Varrock Sewers", "description": "Grants access to the Varrock Sewers.", "category": "AREA", "relicType": "EXPLORATION", "requiredTier": "APPRENTICE", "prerequisites": [], "areaDefinition": "REGION_ID:12950" },
+    { "id": "AREA_CRAFTING_GUILD", "name": "Unlock: Crafting Guild", "description": "Grants access to the Crafting Guild.", "category": "AREA", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_CRAFTING_LEVEL_40", "ITEM_BROWN_APRON"], "areaDefinition": "REGION_ID:11603" }, // Requires 40 Crafting and Brown Apron
+    { "id": "AREA_MINING_GUILD", "name": "Unlock: Mining Guild", "description": "Grants access to the Mining Guild.", "category": "AREA", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_MINING_LEVEL_60"], "areaDefinition": "REGION_ID:12183" }, // Requires 60 Mining
+
+
+    // ==================================
+    //        F2P QUESTS
+    // ==================================
+    // Note: Using placeholder quest IDs, verify actual OSRS F2P quest IDs if needed
+    { "id": "QUEST_COOKS_ASSISTANT", "name": "Unlock: Cook's Assistant", "description": "Allows starting the Cook's Assistant quest.", "category": "QUEST", "relicType": "EXPLORATION", "requiredTier": "APPRENTICE", "prerequisites": [], "questId": 20 },
+    { "id": "QUEST_RUNE_MYSTERIES", "name": "Unlock: Rune Mysteries", "description": "Allows starting the Rune Mysteries quest.", "category": "QUEST", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": [], "questId": 63 },
+    { "id": "QUEST_SHEEP_SHEARER", "name": "Unlock: Sheep Shearer", "description": "Allows starting the Sheep Shearer quest.", "category": "QUEST", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": [], "questId": 69 },
+    { "id": "QUEST_IMP_CATCHER", "name": "Unlock: Imp Catcher", "description": "Allows starting the Imp Catcher quest.", "category": "QUEST", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": [], "questId": 43 },
+    { "id": "QUEST_VAMPYRE_SLAYER", "name": "Unlock: Vampyre Slayer", "description": "Allows starting the Vampyre Slayer quest.", "category": "QUEST", "relicType": "COMBAT", "requiredTier": "APPRENTICE", "prerequisites": [], "questId": 73 },
+    { "id": "QUEST_DRAGON_SLAYER_I_F2P", "name": "Unlock: Dragon Slayer I", "description": "Allows starting the Dragon Slayer I quest (F2P version).", "category": "QUEST", "relicType": "COMBAT", "requiredTier": "EXPERT", "prerequisites": [], "questId": 30 }, // Requires 32 QP
+
+
+    // ==================================
+    //        F2P MECHANICS
+    // ==================================
+
+
+    // ==================================
+    //     F2P SKILLING METHODS
+    // ==================================
+    { "id": "SKILLING_METHOD_OAK_TREES", "name": "Unlock: Oak Trees", "description": "Allows chopping Oak trees.", "category": "SKILLING_METHOD", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_20"] },
+    { "id": "SKILLING_METHOD_WILLOW_TREES", "name": "Unlock: Willow Trees", "description": "Allows chopping Willow trees.", "category": "SKILLING_METHOD", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_30"] },
+    { "id": "SKILLING_METHOD_MAPLE_TREES", "name": "Unlock: Maple Trees", "description": "Allows chopping Maple trees.", "category": "SKILLING_METHOD", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_WOODCUTTING_LEVEL_50"] },
+    { "id": "SKILLING_METHOD_IRON_ORE", "name": "Unlock: Iron Ore", "description": "Allows mining Iron ore.", "category": "SKILLING_METHOD", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_MINING_LEVEL_20"] },
+    { "id": "SKILLING_METHOD_COAL_ORE", "name": "Unlock: Coal Ore", "description": "Allows mining Coal ore.", "category": "SKILLING_METHOD", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_MINING_LEVEL_30"] },
+    { "id": "SKILLING_METHOD_MITHRIL_ORE", "name": "Unlock: Mithril Ore", "description": "Allows mining Mithril ore.", "category": "SKILLING_METHOD", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_MINING_LEVEL_60"] },
+    { "id": "SKILLING_METHOD_ADAMANTITE_ORE", "name": "Unlock: Adamantite Ore", "description": "Allows mining Adamantite ore.", "category": "SKILLING_METHOD", "relicType": "SKILLING", "requiredTier": "MASTER", "prerequisites": ["SKILL_MINING_LEVEL_70"] },
+    { "id": "ITEM_FLY_FISHING_ROD", "name": "Unlock: Fly Fishing Rod", "description": "Allows equipping/using a Fly Fishing Rod.", "category": "SPECIFIC_ITEM", "relicType": "SKILLING", "requiredTier": "APPRENTICE", "prerequisites": ["SKILL_FISHING_LEVEL_20"], "itemIds": [309] },
+    { "id": "ITEM_LOBSTER_POT", "name": "Unlock: Lobster Pot", "description": "Allows equipping/using a Lobster Pot.", "category": "SPECIFIC_ITEM", "relicType": "SKILLING", "requiredTier": "JOURNEYMAN", "prerequisites": ["SKILL_FISHING_LEVEL_40"], "itemIds": [301] },
+    { "id": "ITEM_HARPOON", "name": "Unlock: Harpoon", "description": "Allows equipping/using a Harpoon.", "category": "SPECIFIC_ITEM", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_FISHING_LEVEL_50"], "itemIds": [311] },
+    { "id": "ITEM_BROWN_APRON", "name": "Unlock: Brown Apron", "description": "Allows equipping/using a Brown Apron.", "category": "SPECIFIC_ITEM", "relicType": "SKILLING", "requiredTier": "EXPERT", "prerequisites": ["SKILL_CRAFTING_LEVEL_40"], "itemIds": [1757] },
+
+
+    // ==================================
+    //        F2P BOSSES
+    // ==================================
+    { "id": "BOSS_OBOR", "name": "Unlock: Obor", "description": "Allows access to Obor's lair.", "category": "BOSS", "relicType": "COMBAT", "requiredTier": "JOURNEYMAN", "prerequisites": ["AREA_EDGEVILLE_DUNGEON"] },
+
+
+
+    // --- Add more F2P specific unlocks as needed ---
+
+  ]
+}
