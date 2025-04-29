@@ -28,6 +28,9 @@ public class ItemRestrictionOverlay extends WidgetItemOverlay {
         // Show overlay only on Inventory and Equipment widgets initially
         showOnInventory();
         showOnEquipment();
+        // TODO: Potentially add Bank and other relevant containers if needed
+        // showOnBank();
+        // showOnTrade();
     }
 
     /**
@@ -41,7 +44,8 @@ public class ItemRestrictionOverlay extends WidgetItemOverlay {
         }
 
         // Check if the item is restricted using the plugin's helper method
-        if (!plugin.isMeleeItemAllowed(itemId)) {
+        // *** FIX: Changed isMeleeItemAllowed to isItemAllowed ***
+        if (!plugin.isItemAllowed(itemId)) {
             Rectangle bounds = widgetItem.getCanvasBounds();
             if (bounds != null && bounds.width > 0 && bounds.height > 0) {
                 // Get tint color from config

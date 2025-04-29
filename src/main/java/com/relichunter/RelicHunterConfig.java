@@ -7,6 +7,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
+import net.runelite.client.config.Range; // Added import
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -33,6 +34,15 @@ public interface RelicHunterConfig extends Config
     )
     String progressionTiersSection = "progressionTiers";
 
+    // --- NEW SECTION: Relic Acquisition ---
+    @ConfigSection(
+            name = "Relic Acquisition",
+            description = "Configure chances and parameters for obtaining relics.",
+            position = 20, // Position after Progression Tiers
+            closedByDefault = true
+    )
+    String acquisitionSection = "acquisition";
+
     @ConfigSection(
             name = "Visual Overlays",
             description = "Settings for visual indicators and overlays.",
@@ -40,6 +50,14 @@ public interface RelicHunterConfig extends Config
             closedByDefault = false
     )
     String visualOverlaysSection = "visualOverlays";
+
+    @ConfigSection(
+            name = "Warnings & Blocking",
+            description = "Configure warnings for restricted actions and experimental blocking.",
+            position = 75,
+            closedByDefault = false
+    )
+    String warningsSection = "warnings";
 
 
     @ConfigSection(
@@ -52,7 +70,7 @@ public interface RelicHunterConfig extends Config
 
 
     // --- Tiered Relic Counts ---
-
+    // (Keep existing relic count items)
     @ConfigItem(keyName = "skillingRelicsApprentice", name = "Skilling (Apprentice)", description = "Number of Apprentice Skilling Relics held.", position = 1, section = relicCountsSection)
     default int skillingRelicsApprentice() { return 0; }
     void setSkillingRelicsApprentice(int count);
@@ -61,31 +79,63 @@ public interface RelicHunterConfig extends Config
     default int skillingRelicsJourneyman() { return 0; }
     void setSkillingRelicsJourneyman(int count);
 
-    // TODO: Add Expert, Master, Grandmaster counts for Skilling relics
+    @ConfigItem(keyName = "skillingRelicsExpert", name = "Skilling (Expert)", description = "Number of Expert Skilling Relics held.", position = 3, section = relicCountsSection)
+    default int skillingRelicsExpert() { return 0; }
+    void setSkillingRelicsExpert(int count);
 
-    @ConfigItem(keyName = "combatRelicsApprentice", name = "Combat (Apprentice)", description = "Number of Apprentice Combat Relics held.", position = 5, section = relicCountsSection)
+    @ConfigItem(keyName = "skillingRelicsMaster", name = "Skilling (Master)", description = "Number of Master Skilling Relics held.", position = 4, section = relicCountsSection)
+    default int skillingRelicsMaster() { return 0; }
+    void setSkillingRelicsMaster(int count);
+
+    @ConfigItem(keyName = "skillingRelicsGrandmaster", name = "Skilling (Grandmaster)", description = "Number of Grandmaster Skilling Relics held.", position = 5, section = relicCountsSection)
+    default int skillingRelicsGrandmaster() { return 0; }
+    void setSkillingRelicsGrandmaster(int count);
+
+
+    @ConfigItem(keyName = "combatRelicsApprentice", name = "Combat (Apprentice)", description = "Number of Apprentice Combat Relics held.", position = 6, section = relicCountsSection)
     default int combatRelicsApprentice() { return 0; }
     void setCombatRelicsApprentice(int count);
 
-    @ConfigItem(keyName = "combatRelicsJourneyman", name = "Combat (Journeyman)", description = "Number of Journeyman Combat Relics held.", position = 6, section = relicCountsSection)
+    @ConfigItem(keyName = "combatRelicsJourneyman", name = "Combat (Journeyman)", description = "Number of Journeyman Combat Relics held.", position = 7, section = relicCountsSection)
     default int combatRelicsJourneyman() { return 0; }
     void setCombatRelicsJourneyman(int count);
 
-    // TODO: Add Expert, Master, Grandmaster counts for Combat relics
+    @ConfigItem(keyName = "combatRelicsExpert", name = "Combat (Expert)", description = "Number of Expert Combat Relics held.", position = 8, section = relicCountsSection)
+    default int combatRelicsExpert() { return 0; }
+    void setCombatRelicsExpert(int count);
 
-    @ConfigItem(keyName = "explorationRelicsApprentice", name = "Exploration (Apprentice)", description = "Number of Apprentice Exploration Relics held.", position = 9, section = relicCountsSection)
+    @ConfigItem(keyName = "combatRelicsMaster", name = "Combat (Master)", description = "Number of Master Combat Relics held.", position = 9, section = relicCountsSection)
+    default int combatRelicsMaster() { return 0; }
+    void setCombatRelicsMaster(int count);
+
+    @ConfigItem(keyName = "combatRelicsGrandmaster", name = "Combat (Grandmaster)", description = "Number of Grandmaster Combat Relics held.", position = 10, section = relicCountsSection)
+    default int combatRelicsGrandmaster() { return 0; }
+    void setCombatRelicsGrandmaster(int count);
+
+
+    @ConfigItem(keyName = "explorationRelicsApprentice", name = "Exploration (Apprentice)", description = "Number of Apprentice Exploration Relics held.", position = 11, section = relicCountsSection)
     default int explorationRelicsApprentice() { return 0; }
     void setExplorationRelicsApprentice(int count);
 
-    @ConfigItem(keyName = "explorationRelicsJourneyman", name = "Exploration (Journeyman)", description = "Number of Journeyman Exploration Relics held.", position = 10, section = relicCountsSection)
+    @ConfigItem(keyName = "explorationRelicsJourneyman", name = "Exploration (Journeyman)", description = "Number of Journeyman Exploration Relics held.", position = 12, section = relicCountsSection)
     default int explorationRelicsJourneyman() { return 0; }
     void setExplorationRelicsJourneyman(int count);
 
-    // TODO: Add Expert, Master, Grandmaster counts for Exploration relics
+    @ConfigItem(keyName = "explorationRelicsExpert", name = "Exploration (Expert)", description = "Number of Expert Exploration Relics held.", position = 13, section = relicCountsSection)
+    default int explorationRelicsExpert() { return 0; }
+    void setExplorationRelicsExpert(int count);
+
+    @ConfigItem(keyName = "explorationRelicsMaster", name = "Exploration (Master)", description = "Number of Master Exploration Relics held.", position = 14, section = relicCountsSection)
+    default int explorationRelicsMaster() { return 0; }
+    void setExplorationRelicsMaster(int count);
+
+    @ConfigItem(keyName = "explorationRelicsGrandmaster", name = "Exploration (Grandmaster)", description = "Number of Grandmaster Exploration Relics held.", position = 15, section = relicCountsSection)
+    default int explorationRelicsGrandmaster() { return 0; }
+    void setExplorationRelicsGrandmaster(int count);
 
 
     // --- Progression Tiers ---
-
+    // (Keep existing progression tier items)
     @ConfigItem(keyName = "meleeGearTier", name = "Melee Gear Tier", description = "Highest tier of melee equipment allowed.", position = 11, section = progressionTiersSection)
     default GearTier meleeGearTier() { return GearTier.STEEL; }
     void setMeleeGearTier(GearTier tier);
@@ -167,6 +217,67 @@ public interface RelicHunterConfig extends Config
     void setConstructionTier(SkillTier tier);
 
 
+    // --- Relic Acquisition Settings ---
+
+    // Skilling
+    @Range(min = 1, max = 10000)
+    @ConfigItem(keyName = "skillingRelicBaseChance", name = "Skilling Base Chance (1 in X)", description = "Base chance to roll for a skilling relic upon gaining eligible XP.", position = 21, section = acquisitionSection)
+    default int skillingRelicBaseChance() { return 500; }
+
+    @ConfigItem(keyName = "skillingRelicXpThresholdApp", name = "Skilling XP Thresh. (Apprentice)", description = "Max XP drop to allow Apprentice relics.", position = 22, section = acquisitionSection)
+    default int skillingRelicXpThresholdApp() { return 10; }
+
+    @ConfigItem(keyName = "skillingRelicXpThresholdJour", name = "Skilling XP Thresh. (Journeyman)", description = "Max XP drop to allow Journeyman relics.", position = 23, section = acquisitionSection)
+    default int skillingRelicXpThresholdJour() { return 30; }
+
+    @ConfigItem(keyName = "skillingRelicXpThresholdExp", name = "Skilling XP Thresh. (Expert)", description = "Max XP drop to allow Expert relics.", position = 24, section = acquisitionSection)
+    default int skillingRelicXpThresholdExp() { return 70; }
+
+    @ConfigItem(keyName = "skillingRelicXpThresholdMas", name = "Skilling XP Thresh. (Master)", description = "Max XP drop to allow Master relics.", position = 25, section = acquisitionSection)
+    default int skillingRelicXpThresholdMas() { return 150; }
+    // Grandmaster is implicitly > Master threshold
+
+    // Combat
+    @Range(min = 1, max = 10000)
+    @ConfigItem(keyName = "combatRelicBaseChance", name = "Combat Base Chance (1 in X)", description = "Base chance to roll for a combat relic upon killing an eligible NPC.", position = 31, section = acquisitionSection)
+    default int combatRelicBaseChance() { return 200; }
+
+    @ConfigItem(keyName = "combatRelicNpcLevelApp", name = "Combat NPC Lvl (Apprentice)", description = "Max NPC combat level to allow Apprentice relics.", position = 32, section = acquisitionSection)
+    default int combatRelicNpcLevelApp() { return 20; }
+
+    @ConfigItem(keyName = "combatRelicNpcLevelJour", name = "Combat NPC Lvl (Journeyman)", description = "Max NPC combat level to allow Journeyman relics.", position = 33, section = acquisitionSection)
+    default int combatRelicNpcLevelJour() { return 50; }
+
+    @ConfigItem(keyName = "combatRelicNpcLevelExp", name = "Combat NPC Lvl (Expert)", description = "Max NPC combat level to allow Expert relics.", position = 34, section = acquisitionSection)
+    default int combatRelicNpcLevelExp() { return 90; }
+
+    @ConfigItem(keyName = "combatRelicNpcLevelMas", name = "Combat NPC Lvl (Master)", description = "Max NPC combat level to allow Master relics.", position = 35, section = acquisitionSection)
+    default int combatRelicNpcLevelMas() { return 150; }
+    // Grandmaster is implicitly > Master threshold
+
+    // Exploration (Clues)
+    @Range(min = 0, max = 100)
+    @ConfigItem(keyName = "explorationRelicChanceEasy", name = "Exploration Chance (Easy %)", description = "Percent chance to get an Apprentice Exploration relic from an Easy casket.", position = 41, section = acquisitionSection)
+    default int explorationRelicChanceEasy() { return 33; }
+
+    @Range(min = 0, max = 100)
+    @ConfigItem(keyName = "explorationRelicChanceMedium", name = "Exploration Chance (Medium %)", description = "Percent chance to get a Journeyman Exploration relic from a Medium casket.", position = 42, section = acquisitionSection)
+    default int explorationRelicChanceMedium() { return 33; }
+
+    @Range(min = 0, max = 100)
+    @ConfigItem(keyName = "explorationRelicChanceHard", name = "Exploration Chance (Hard %)", description = "Percent chance to get an Expert Exploration relic from a Hard casket.", position = 43, section = acquisitionSection)
+    default int explorationRelicChanceHard() { return 33; }
+
+    @Range(min = 0, max = 100)
+    @ConfigItem(keyName = "explorationRelicChanceElite", name = "Exploration Chance (Elite %)", description = "Percent chance to get a Master Exploration relic from an Elite casket.", position = 44, section = acquisitionSection)
+    default int explorationRelicChanceElite() { return 33; }
+
+    @Range(min = 0, max = 100)
+    @ConfigItem(keyName = "explorationRelicChanceMaster", name = "Exploration Chance (Master %)", description = "Percent chance to get a Grandmaster Exploration relic from a Master casket.", position = 45, section = acquisitionSection)
+    default int explorationRelicChanceMaster() { return 33; }
+    // Beginner/GM caskets might need separate handling or can default
+
+
     // --- Visual Overlays ---
     @ConfigItem( keyName = "showItemRestrictions", name = "Highlight Restricted Items", description = "Enable to visually tint items you cannot currently use.", position = 51, section = visualOverlaysSection )
     default boolean showItemRestrictions() { return true; }
@@ -179,7 +290,20 @@ public interface RelicHunterConfig extends Config
 
     @ConfigItem( keyName = "showSkillTierVisuals", name = "Show Skill Tier Visuals", description = "Enable to show tier status (Locked tint, level cap) on the Skills tab.", position = 53, section = visualOverlaysSection )
     default boolean showSkillTierVisuals() { return true; }
-    // Setter not strictly needed
+
+
+    // --- Warnings & Blocking ---
+    @ConfigItem(keyName = "warnOnRestrictedXpGain", name = "Warn on Restricted XP Gain", description = "Show a chat warning if you gain XP in a skill that is locked or above its tier cap.", position = 76, section = warningsSection)
+    default boolean warnOnRestrictedXpGain() { return true; }
+
+    @ConfigItem(keyName = "warnOnRestrictedAreaEntry", name = "Warn on Restricted Area Entry", description = "Show a chat warning if you enter a geographical area that is currently locked.", position = 77, section = warningsSection)
+    default boolean warnOnRestrictedAreaEntry() { return true; }
+
+    @ConfigItem(keyName = "warnOnRestrictedItemUse", name = "Warn on Restricted Item Use", description = "Show a chat warning if you attempt to wield or wear a restricted item.", position = 78, section = warningsSection)
+    default boolean warnOnRestrictedItemUse() { return true; }
+
+    @ConfigItem(keyName = "attemptBlockRestrictedItemUse", name = "Attempt to Block Restricted Item Use (Experimental)", description = "Tries to prevent wielding/wearing restricted items. This is experimental, may not work reliably, and could break with game updates.", position = 79, section = warningsSection, warning = "Experimental: This feature attempts to block actions client-side and might be unreliable or interfere with gameplay.")
+    default boolean attemptBlockRestrictedItemUse() { return false; }
 
 
     // --- Testing & Management ---
