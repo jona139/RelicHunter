@@ -50,10 +50,8 @@ public class RelicHunterPanel extends PluginPanel {
     private final JPanel contentPanel;
     private final JPanel relicCountsDisplayPanel;
     private final JButton activateButton = new JButton("Activate Relic");
-    private final JPanel choicePanel = new JPanel();
-    private final JButton confirmButton = new JButton("Confirm Selection");
-    private final JButton cancelButton = new JButton("Cancel");
-    private final PluginErrorPanel errorPanel = new PluginErrorPanel();
+    // --- REMOVED Choice Panel Components ---
+    private final PluginErrorPanel errorPanel = new PluginErrorPanel(); // Keep error panel
     private final JPanel unlockedItemsPanel;
     private final JScrollPane unlockedScrollPane;
     private final JPanel progressionTiersPanel;
@@ -63,10 +61,7 @@ public class RelicHunterPanel extends PluginPanel {
     private final JLabel meleeGearIconLabel = new JLabel();
 
     // State
-    private Unlockable selectedUnlock = null;
-    private final List<JButton> choiceButtons = new ArrayList<>();
-    private final Border defaultButtonBorder = UIManager.getBorder("Button.border");
-    private final Border selectedButtonBorder = BorderFactory.createLineBorder(ColorScheme.BRAND_ORANGE, 2);
+    // --- REMOVED Choice State ---
 
     // Icons
     private ImageIcon skillingRelicIcon;
@@ -126,8 +121,8 @@ public class RelicHunterPanel extends PluginPanel {
         styleButton(activateButton);
         activateButton.addActionListener(e -> {
             log.debug("Activate Relic button clicked.");
-            prepareChoiceArea(); // Prepare the area *before* calling the plugin
-            plugin.initiateActivationSequence();
+            // --- REMOVED prepareChoiceArea call ---
+            plugin.initiateActivationSequence(); // Plugin now handles showing overlay or error
         });
         JPanel activateButtonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         activateButtonPanel.setBackground(contentPanel.getBackground());
@@ -135,18 +130,7 @@ public class RelicHunterPanel extends PluginPanel {
         contentPanel.add(activateButtonPanel, gbcMain);
         gbcMain.gridy++;
 
-        // Choice Panel Setup
-        choicePanel.setBackground(ColorScheme.DARK_GRAY_COLOR);
-        choicePanel.setLayout(new BoxLayout(choicePanel, BoxLayout.Y_AXIS));
-        choicePanel.setVisible(false);
-        styleButton(confirmButton);
-        confirmButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        confirmButton.addActionListener(this::onConfirmClicked);
-        styleButton(cancelButton);
-        cancelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        cancelButton.addActionListener(this::onCancelClicked);
-        contentPanel.add(choicePanel, gbcMain);
-        gbcMain.gridy++;
+        // --- REMOVED Choice Panel Setup ---
 
         // Unlocked Content Display Setup
         JLabel unlockedTitle = new JLabel("Unlocked Content");
@@ -181,6 +165,11 @@ public class RelicHunterPanel extends PluginPanel {
 
         // Error Panel Setup
         errorPanel.setContent("Relic Hunter Helper", "Welcome! Activate a relic to begin.");
+        // Add error panel to the main layout, initially hidden
+        errorPanel.setVisible(false);
+        contentPanel.add(errorPanel, gbcMain);
+        gbcMain.gridy++;
+
 
         // Filler
         gbcMain.weighty = 1.0;
@@ -197,9 +186,10 @@ public class RelicHunterPanel extends PluginPanel {
     // --- Icon Loading Helper ---
     private void loadIcons() {
         try {
-            if (skillingRelicIcon == null) skillingRelicIcon = createPlaceholderIcon("S");
-            if (combatRelicIcon == null) combatRelicIcon = createPlaceholderIcon("C");
-            if (explorationRelicIcon == null) explorationRelicIcon = createPlaceholderIcon("E");
+            // Simplified icon loading - replace with actual icons later
+            skillingRelicIcon = createPlaceholderIcon("S");
+            combatRelicIcon = createPlaceholderIcon("C");
+            explorationRelicIcon = createPlaceholderIcon("E");
             lockedIcon = createPlaceholderIcon("X", Color.RED);
         } catch (Exception e) {
             log.error("Failed to load icons", e);
@@ -414,8 +404,6 @@ public class RelicHunterPanel extends PluginPanel {
         });
     }
 
-    // Removed getAvailableRelicCounts
-
     public void updateUnlockedDisplay() {
         SwingUtilities.invokeLater(() -> {
             unlockedItemsPanel.removeAll();
@@ -549,99 +537,7 @@ public class RelicHunterPanel extends PluginPanel {
 
 
     // --- Choice/Error Display ---
-    public void displayChoices(final List<Unlockable> choices) {
-        SwingUtilities.invokeLater(() -> {
-            prepareChoiceArea();
-            if (choices == null || choices.isEmpty()) {
-                displayError("No valid unlocks available for this relic type.");
-                return;
-            }
-
-            JLabel chooseTitle = new JLabel("Select Your Unlock:");
-            chooseTitle.setFont(FontManager.getRunescapeSmallFont());
-            chooseTitle.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-            chooseTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
-            choicePanel.add(chooseTitle);
-            choicePanel.add(Box.createRigidArea(new Dimension(0, 8)));
-
-            for (Unlockable choice : choices) {
-                JButton choiceButton = new JButton();
-                styleChoiceButton(choiceButton, choice);
-                choiceButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-                choiceButton.addActionListener(e -> onChoiceSelected(choice, choiceButton));
-                choiceButtons.add(choiceButton);
-                choicePanel.add(choiceButton);
-                choicePanel.add(Box.createRigidArea(new Dimension(0, 5)));
-            }
-            choicePanel.add(Box.createRigidArea(new Dimension(0, 10)));
-
-            JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-            buttonPanel.setBackground(choicePanel.getBackground());
-            buttonPanel.add(confirmButton);
-            buttonPanel.add(cancelButton);
-            buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-            buttonPanel.setMaximumSize(new Dimension(PluginPanel.PANEL_WIDTH, confirmButton.getPreferredSize().height + 5));
-
-            choicePanel.add(buttonPanel);
-            confirmButton.setEnabled(false);
-            choicePanel.setVisible(true);
-            choicePanel.revalidate();
-            choicePanel.repaint();
-            contentPanel.revalidate();
-            contentPanel.repaint();
-        });
-    }
-
-    private void styleChoiceButton(JButton button, Unlockable choice) {
-        button.setLayout(new BorderLayout(5, 0));
-        button.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-        button.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 40, 50));
-        button.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(ColorScheme.DARK_GRAY_COLOR),
-                new EmptyBorder(5, 10, 5, 10)
-        ));
-        button.setOpaque(true);
-        button.setFocusPainted(false);
-
-        JLabel iconLabel = new JLabel();
-        iconLabel.setPreferredSize(new Dimension(20, 20));
-        Optional<UnlockData> dataOpt = unlockManager.getUnlockById(choice.getId());
-        if (dataOpt.isPresent()) {
-            setUnlockIcon(iconLabel, dataOpt.get());
-        } else {
-            iconLabel.setIcon(createPlaceholderIcon("?"));
-        }
-        button.add(iconLabel, BorderLayout.WEST);
-
-        JPanel textPanel = new JPanel();
-        textPanel.setOpaque(false);
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-
-        JLabel nameLabel = new JLabel(choice.getName());
-        nameLabel.setFont(FontManager.getRunescapeSmallFont().deriveFont(Font.BOLD));
-        nameLabel.setForeground(Color.WHITE);
-        textPanel.add(nameLabel);
-
-        JLabel descLabel = new JLabel(choice.getDescription());
-        descLabel.setFont(FontManager.getRunescapeSmallFont().deriveFont(10f));
-        descLabel.setForeground(ColorScheme.LIGHT_GRAY_COLOR);
-        textPanel.add(descLabel);
-
-        button.add(textPanel, BorderLayout.CENTER);
-
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                if (button.isEnabled()) {
-                    button.setBackground(ColorScheme.DARKER_GRAY_HOVER_COLOR);
-                }
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                if (button.isEnabled()) {
-                    button.setBackground(ColorScheme.DARKER_GRAY_COLOR);
-                }
-            }
-        });
-    }
+    // --- REMOVED displayChoices method ---
 
     // Helper to set icon based on UnlockData (consolidated logic)
     private void setUnlockIcon(JLabel label, UnlockData unlock) {
@@ -678,77 +574,35 @@ public class RelicHunterPanel extends PluginPanel {
 
     public void displayError(String message) {
         SwingUtilities.invokeLater(() -> {
-            prepareChoiceArea();
+            // --- REMOVED prepareChoiceArea call ---
             errorPanel.setContent("Activation Error", message);
-            choicePanel.add(errorPanel);
-            choicePanel.setVisible(true);
-            choicePanel.revalidate();
-            choicePanel.repaint();
+            errorPanel.setVisible(true); // Show the error panel
+            // Hide other potential elements if needed
             contentPanel.revalidate();
             contentPanel.repaint();
         });
     }
 
-    private void prepareChoiceArea() {
-        choicePanel.removeAll();
-        // *** FIXED: Corrected border creation and title setting ***
-        TitledBorder titledBorder = BorderFactory.createTitledBorder(
-                BorderFactory.createEtchedBorder(), "Choose Your Unlock",
-                TitledBorder.DEFAULT_JUSTIFICATION,
-                TitledBorder.DEFAULT_POSITION,
-                FontManager.getRunescapeSmallFont(),
-                ColorScheme.LIGHT_GRAY_COLOR);
-        // Set title color on the TitledBorder instance
-        titledBorder.setTitleColor(ColorScheme.LIGHT_GRAY_COLOR);
+    // --- REMOVED prepareChoiceArea method ---
 
-        choicePanel.setBorder(BorderFactory.createCompoundBorder(
-                titledBorder, // Use the TitledBorder we just created and configured
-                new EmptyBorder(10, 5, 10, 5) // Inner padding
-        ));
-        // *** Removed the incorrect cast and setTitleColor call here ***
-        // ((javax.swing.border.TitledBorder) choicePanel.getBorder()).setTitleColor(ColorScheme.LIGHT_GRAY_COLOR);
-        choiceButtons.clear();
-        selectedUnlock = null;
-    }
-
-    public void clearChoiceDisplay() {
+    // *** ADDED: Method to clear error display ***
+    public void clearErrorDisplay() {
         SwingUtilities.invokeLater(() -> {
-            choicePanel.removeAll();
-            choicePanel.setVisible(false);
-            choiceButtons.clear();
-            selectedUnlock = null;
-            choicePanel.revalidate();
-            choicePanel.repaint();
+            errorPanel.setVisible(false);
             contentPanel.revalidate();
             contentPanel.repaint();
         });
     }
+
+    // *** ADDED: Clear choice display method (called by plugin) ***
+    public void clearChoiceDisplay() {
+        // This panel no longer handles choices, but we might want to clear errors
+        clearErrorDisplay();
+    }
+
 
     // --- Action Handlers ---
-    private void onChoiceSelected(Unlockable choice, JButton clickedButton) {
-        selectedUnlock = choice;
-        for (JButton btn : choiceButtons) {
-            btn.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(btn == clickedButton ? ColorScheme.BRAND_ORANGE : ColorScheme.DARK_GRAY_COLOR, btn == clickedButton ? 2 : 1),
-                    new EmptyBorder(5, 10, 5, 10)
-            ));
-            btn.setBackground(btn == clickedButton ? ColorScheme.DARK_GRAY_HOVER_COLOR : ColorScheme.DARKER_GRAY_COLOR);
-        }
-        confirmButton.setEnabled(true);
-    }
-
-    private void onConfirmClicked(ActionEvent event) {
-        if (selectedUnlock != null) {
-            plugin.completeRelicActivation(selectedUnlock);
-            clearChoiceDisplay();
-        } else {
-            log.warn("Confirm clicked but no selection was made.");
-        }
-    }
-
-    private void onCancelClicked(ActionEvent event) {
-        clearChoiceDisplay();
-    }
+    // --- REMOVED onChoiceSelected, onConfirmClicked, onCancelClicked ---
 
     // Helper to style main buttons
     private void styleButton(JButton button) {
@@ -781,8 +635,8 @@ public class RelicHunterPanel extends PluginPanel {
         log.debug("Relic Hunter Panel shutting down.");
     }
 
-    // Static inner class for Skill Icon mapping
-    private static class SkillIconManager {
+    // Static inner class for Skill Icon mapping (Keep this)
+    public static class SkillIconManager {
         private static final Map<Skill, Integer> skillSpriteIds = new EnumMap<>(Skill.class);
         static {
             skillSpriteIds.put(Skill.ATTACK, SpriteID.SKILL_ATTACK);

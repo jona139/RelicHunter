@@ -11,12 +11,11 @@ import javax.inject.Inject;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.coords.LocalPoint; // Needed for graphics/scene coords
+import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.ChatMessage;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
-// Removed ItemSpawned, ItemDespawned, MenuEntryAdded imports
 import net.runelite.api.events.MenuOptionClicked;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.StatChanged;
@@ -29,7 +28,8 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.game.SpriteManager;
-// Removed MenuManager import
+// Removed MouseListener import
+import net.runelite.client.input.MouseManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
@@ -38,10 +38,10 @@ import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.Text;
-// Removed Guava Cache imports
 
 import javax.swing.*;
 import java.awt.Color;
+// Removed MouseEvent import
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -57,10 +57,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-// Removed TimeUnit import
 import java.util.function.Function;
-import java.util.regex.Matcher; // Import Matcher
-import java.util.regex.Pattern; // *** ADDED Pattern import ***
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -70,6 +69,7 @@ import java.util.stream.Collectors;
         description = "Helps track progress and restrictions for the Relic Hunter Ironman mode.",
         tags = {"ironman", "relic", "hunter", "helper", "restriction", "unique"}
 )
+// *** REMOVED implements MouseListener ***
 public class RelicHunterPlugin extends Plugin
 {
     static final String CONFIG_GROUP = "relichunter";
@@ -87,10 +87,12 @@ public class RelicHunterPlugin extends Plugin
     @Inject private ItemRestrictionOverlay itemRestrictionOverlay;
     @Inject private SkillTabOverlay skillTabOverlay;
     @Inject private QuestLogOverlay questLogOverlay;
+    @Inject private RelicChoiceOverlay relicChoiceOverlay;
     @Inject private ClientThread clientThread;
     @Inject private ItemManager itemManager;
     @Inject private UnlockManager unlockManager;
     @Inject private SpriteManager spriteManager;
+    @Inject private MouseManager mouseManager; // Keep MouseManager injection
 
     // Plugin State
     private RelicHunterPanel panel;
@@ -106,11 +108,11 @@ public class RelicHunterPlugin extends Plugin
     private static final Pattern CLUE_SCROLL_COMPLETION_PATTERN = Pattern.compile("You have completed (.+) Treasure Trail!");
 
     // Constants for visual effects (Using Integer IDs)
-    private static final int UNLOCK_ANIMATION_ID = 7751; // Shattered Relics unlock anim
-    private static final int UNLOCK_GRAPHIC_ID = 1414;   // Shattered Relics unlock graphic
-    private static final int RELIC_DROP_GRAPHIC_ID = 111; // Teleport/Level up graphic for relic acquisition
-    private static final int RELIC_DROP_SOUND_ID = 202; // Example: Item pickup sound for relic acquisition
-    private static final int RELIC_UNLOCK_CONFIRM_SOUND_ID = 202; // Sound for activating/confirming unlock choice
+    private static final int UNLOCK_ANIMATION_ID = 7751;
+    private static final int UNLOCK_GRAPHIC_ID = 1414;
+    private static final int RELIC_DROP_GRAPHIC_ID = 111;
+    private static final int RELIC_DROP_SOUND_ID = 202;
+    private static final int RELIC_UNLOCK_CONFIRM_SOUND_ID = 202;
 
 
     @Override
@@ -131,6 +133,9 @@ public class RelicHunterPlugin extends Plugin
         overlayManager.add(itemRestrictionOverlay);
         overlayManager.add(skillTabOverlay);
         overlayManager.add(questLogOverlay);
+        overlayManager.add(relicChoiceOverlay);
+        // *** Register the OVERLAY as the listener ***
+        mouseManager.registerMouseListener(relicChoiceOverlay);
 
         initialPanelUpdateDone = false;
         lastPlayerRegionId = -1;
@@ -157,6 +162,9 @@ public class RelicHunterPlugin extends Plugin
         overlayManager.remove(itemRestrictionOverlay);
         overlayManager.remove(skillTabOverlay);
         overlayManager.remove(questLogOverlay);
+        overlayManager.remove(relicChoiceOverlay);
+        // *** Unregister the OVERLAY as the listener ***
+        mouseManager.unregisterMouseListener(relicChoiceOverlay);
         clientToolbar.removeNavigation(navButton);
         if (panel != null) { panel.shutdown(); }
         panel = null;
@@ -165,6 +173,7 @@ public class RelicHunterPlugin extends Plugin
         previousSkillXp.clear();
         recentlyProcessedNpcs.clear();
         unlockManager.clearDatabase();
+        relicChoiceOverlay.clearChoices();
     }
 
     private void initializePreviousXpMap() {
@@ -213,6 +222,8 @@ public class RelicHunterPlugin extends Plugin
     // --- Relic Activation Logic ---
     public void initiateActivationSequence() {
         log.debug("Initiating activation sequence...");
+        clearChoiceDisplay();
+
         Map<RelicType, Map<SkillTier, Integer>> availableRelics = getAvailableRelicCounts();
         List<Map.Entry<RelicType, SkillTier>> usableOptions = new ArrayList<>();
         availableRelics.forEach((type, tierMap) -> tierMap.forEach((tier, count) -> {
@@ -220,7 +231,12 @@ public class RelicHunterPlugin extends Plugin
         }));
 
         if (usableOptions.isEmpty()) {
-            if (panel != null) panel.displayError("You do not have any relics to activate!");
+            log.warn("Activation initiated but no relics are held.");
+            if (panel != null) {
+                panel.displayError("You do not have any relics to activate!");
+            } else {
+                sendChatMessage("You do not have any relics to activate!", ChatMessageType.GAMEMESSAGE);
+            }
             return;
         }
 
@@ -251,6 +267,7 @@ public class RelicHunterPlugin extends Plugin
                                 () -> log.error("Could not match selected option '{}'", selectedOption)
                         );
             } else {
+                log.debug("User cancelled relic type/tier selection prompt.");
                 clearChoiceDisplay();
             }
         });
@@ -265,12 +282,18 @@ public class RelicHunterPlugin extends Plugin
     private void startRelicActivation(RelicType type, SkillTier tier) {
         log.info("Starting activation for: Type={}, Tier={}", type, tier);
         int relicCount = getRelicCount(type, tier);
-        if (relicCount <= 0) { if (panel != null) panel.displayError("Internal Error: Relic count is zero"); return; }
+        if (relicCount <= 0) {
+            log.error("startRelicActivation called for {} {} but count is zero.", type, tier);
+            if (panel != null) panel.displayError("Internal Error: Relic count is zero");
+            else sendChatMessage("Internal Error: Relic count is zero.", ChatMessageType.GAMEMESSAGE);
+            return;
+        }
 
         List<UnlockData> potentialUnlocks = unlockManager.getPotentialUnlocks(type, tier);
         if (potentialUnlocks.isEmpty()) {
             log.warn("No unlocks defined in database for Relic Type {} and Tier {}", type, tier);
             if (panel != null) panel.displayError("Internal error: No unlocks defined for this relic type/tier.");
+            else sendChatMessage("Internal error: No unlocks defined for this relic type/tier.", ChatMessageType.GAMEMESSAGE);
             return;
         }
         log.debug("Potential unlocks for {} {}: {}", type, tier, potentialUnlocks.stream().map(UnlockData::getId).collect(Collectors.toList()));
@@ -296,9 +319,13 @@ public class RelicHunterPlugin extends Plugin
                 })
                 .collect(Collectors.toList());
 
-        log.info("Found {} valid unlocks after filtering for {} {}.", validUnlocks.size(), type, tier);
+        log.debug("Filtered unlocks. Valid unlocks count: {}. IDs: {}",
+                validUnlocks.size(), validUnlocks.stream().map(UnlockData::getId).collect(Collectors.toList()));
+
         if (validUnlocks.isEmpty()) {
+            log.warn("No valid unlocks available after filtering for {} {}", type, tier);
             if (panel != null) panel.displayError("No new unlocks available for this relic type/tier (already unlocked or prerequisites not met).");
+            else sendChatMessage("No new unlocks available for this relic type/tier.", ChatMessageType.GAMEMESSAGE);
             return;
         }
 
@@ -309,7 +336,19 @@ public class RelicHunterPlugin extends Plugin
                 .map(ud -> new Unlockable(ud.getId(), ud.getName(), ud.getDescription(), ud.getRelicType(), ud.getRequiredTier(), ud.getPrerequisites()))
                 .collect(Collectors.toList());
 
-        if (panel != null) panel.displayChoices(displayChoices);
+        log.debug("Preparing to display choices. Overlay enabled: {}. Display choices count: {}",
+                config.showChoiceOverlay(), displayChoices.size());
+
+        if (config.showChoiceOverlay()) {
+            relicChoiceOverlay.setCurrentChoices(displayChoices);
+            log.debug("Called setCurrentChoices on overlay.");
+        } else if (panel != null) {
+            log.warn("Relic choice overlay disabled, but panel choice display is removed. Cannot show choices.");
+            sendChatMessage("Enable 'Show Choice Overlay' in config to see choices.", ChatMessageType.GAMEMESSAGE);
+        } else {
+            log.error("Cannot display choices - Choice overlay disabled and panel is null.");
+            sendChatMessage("Error: Could not display relic choices.", ChatMessageType.GAMEMESSAGE);
+        }
     }
 
     private boolean checkPrerequisites(UnlockData unlock, Set<String> currentlyUnlockedIds) {
@@ -322,6 +361,7 @@ public class RelicHunterPlugin extends Plugin
         if (chosenUnlockData == null) {
             log.error("Could not find UnlockData for chosen panel unlock ID: {}", chosenPanelUnlock.getId());
             if (panel != null) panel.displayError("Internal Error: Could not process selection.");
+            else sendChatMessage("Internal Error: Could not process selection.", ChatMessageType.GAMEMESSAGE);
             return;
         }
 
@@ -332,6 +372,7 @@ public class RelicHunterPlugin extends Plugin
         if (getRelicCount(consumedRelicType, consumedRelicTier) <= 0) {
             log.error("Relic count mismatch! Trying to consume {} {} but count is zero.", consumedRelicType, consumedRelicTier);
             if (panel != null) panel.displayError("Internal Error: Relic count mismatch");
+            else sendChatMessage("Internal Error: Relic count mismatch.", ChatMessageType.GAMEMESSAGE);
             return;
         }
 
@@ -348,19 +389,17 @@ public class RelicHunterPlugin extends Plugin
         String message = "Relic consumed. Unlocked: " + chosenUnlockData.getName() + "!";
         sendChatMessage(message, ChatMessageType.GAMEMESSAGE);
 
-        // Trigger visual effects for the UNLOCK action
         triggerUnlockEffects();
+        clearChoiceDisplay();
     }
 
-    // Helper method for UNLOCK visual effects
     private void triggerUnlockEffects() {
         clientThread.invoke(() -> {
             Player localPlayer = client.getLocalPlayer();
             if (localPlayer != null) {
-                // Emote
                 if (config.playUnlockEmote()) {
-                    if (localPlayer.getAnimation() == -1 || localPlayer.getAnimation() == AnimationID.IDLE) { // IDLE (-1) is okay
-                        localPlayer.setAnimation(UNLOCK_ANIMATION_ID); // Use integer constant
+                    if (localPlayer.getAnimation() == -1 || localPlayer.getAnimation() == AnimationID.IDLE) {
+                        localPlayer.setAnimation(UNLOCK_ANIMATION_ID);
                         localPlayer.setAnimationFrame(0);
                         log.debug("Triggering unlock animation: {}", UNLOCK_ANIMATION_ID);
                     } else {
@@ -368,14 +407,11 @@ public class RelicHunterPlugin extends Plugin
                     }
                 }
 
-                // Graphic
                 if (config.showUnlockGraphic()) {
-                    localPlayer.setGraphic(UNLOCK_GRAPHIC_ID); // Use integer constant
-                    // Optionally reset frame: localPlayer.setSpotAnimFrame(0);
+                    localPlayer.setGraphic(UNLOCK_GRAPHIC_ID);
                     log.debug("Triggering unlock graphic: {}", UNLOCK_GRAPHIC_ID);
                 }
 
-                // Sound for confirming the unlock
                 client.playSoundEffect(RELIC_UNLOCK_CONFIRM_SOUND_ID);
                 log.debug("Played unlock confirmation sound: {}", RELIC_UNLOCK_CONFIRM_SOUND_ID);
 
@@ -434,10 +470,8 @@ public class RelicHunterPlugin extends Plugin
                             setMeleeGearTier(gearTier);
                             log.info("Set MELEE gear tier to {}", gearTier);
                         } else if ("RANGED".equalsIgnoreCase(gearType)) {
-                            // TODO: Add ranged gear tier handling if separate tiers are implemented
                             log.info("Set RANGED gear tier to {}", gearTier);
                         } else if ("MAGIC".equalsIgnoreCase(gearType)) {
-                            // TODO: Add magic gear tier handling if separate tiers are implemented
                             log.info("Set MAGIC gear tier to {}", gearTier);
                         } else {
                             log.warn("Unhandled gear type in GEAR_TIER unlock: {}", gearType);
@@ -454,21 +488,23 @@ public class RelicHunterPlugin extends Plugin
                 break;
             case AREA:
                 log.info("Unlocked area: {} (ID: {}). (Area restriction logic needs implementation)", unlockedData.getName(), unlockedData.getId());
-                // TODO: Implement actual area restriction updates if needed
                 break;
             case QUEST:
                 log.info("Unlocked quest: {} (ID: {}). (Quest tracking handled by QuestLogOverlay)", unlockedData.getName(), unlockedData.getId());
                 break;
             case MECHANIC:
                 log.info("Unlocked mechanic: {} (ID: {}). (Mechanic restriction logic needs implementation)", unlockedData.getName(), unlockedData.getId());
-                // TODO: Implement actual mechanic restriction updates if needed
                 break;
             default:
                 log.warn("No specific progression state update logic implemented for category: {}", unlockedData.getCategory());
                 break;
         }
         if (panel != null) {
-            clientThread.invokeLater(panel::updateProgressionTiersDisplay);
+            clientThread.invokeLater(() -> {
+                panel.updateUnlockedDisplay();
+                panel.updateProgressionTiersDisplay();
+                panel.updateRelicCounts();
+            });
         }
     }
 
@@ -476,100 +512,63 @@ public class RelicHunterPlugin extends Plugin
     // --- Restriction Checking ---
     public boolean isItemAllowed(int itemId) {
         Set<String> unlockedIds = config.unlockedRelics();
-
         if (!unlockManager.isItemPermittedByUnlocks(itemId, unlockedIds)) {
             log.trace("Item {} denied by specific/gear tier unlocks.", itemId);
             return false;
         }
-
-        // TODO: Re-implement skill requirement checks based on unlocked SkillTiers if needed
-        // ItemComposition itemComp = itemManager.getItemComposition(itemId);
-        // Check itemComp.getRequirements() against getSkillTier(skill).getLevelCap()
-
         log.trace("Item {} permitted (specific/gear tier checks passed).", itemId);
         return true;
     }
 
 
     private boolean isAreaRestricted(WorldPoint playerLocation) {
-        // TODO: Implement proper area restriction based on unlocked AREA type unlocks
         if (playerLocation == null) {
             return false;
         }
-        // Placeholder logic
         return false;
     }
 
 
     // --- Relic Acquisition Helpers ---
-
-    /**
-     * Handles the acquisition of a relic, adding it directly to the count
-     * and potentially triggering visual effects based on source.
-     *
-     * @param type         The type of relic (SKILLING, COMBAT, EXPLORATION).
-     * @param tier         The tier of the relic.
-     * @param source       The source of the relic acquisition.
-     * @param effectLocation The world location to play effects (e.g., NPC death location). Can be null.
-     */
     private void addRelic(RelicType type, SkillTier tier, RelicSource source, @Nullable WorldPoint effectLocation) {
         if (tier == SkillTier.LOCKED) return;
-
         incrementRelicCount(type, tier);
-
         String tierName = tier.getDisplayName();
         String typeName = type.name().substring(0, 1).toUpperCase() + type.name().substring(1).toLowerCase();
         String message = String.format("You found a %s %s Relic!", tierName, typeName);
         sendChatMessage(message, ChatMessageType.GAMEMESSAGE);
-
-        // Trigger visual effects on the player for ANY relic source
         clientThread.invoke(() -> {
             Player localPlayer = client.getLocalPlayer();
             if (localPlayer != null) {
                 log.debug("Attempting to set graphic {} on player for {} relic drop.", RELIC_DROP_GRAPHIC_ID, source);
                 localPlayer.setGraphic(RELIC_DROP_GRAPHIC_ID);
-                // Optionally reset frame if graphic doesn't play correctly
-                // localPlayer.setSpotAnimFrame(0);
                 client.playSoundEffect(RELIC_DROP_SOUND_ID);
                 log.debug("Set graphic and played sound for {} relic drop.", source);
             } else {
                 log.warn("Could not get local player to apply {} relic graphic.", source);
             }
         });
-
-        // Update panel count
         if (panel != null) {
             clientThread.invokeLater(panel::updateRelicCounts);
         }
     }
 
-    /**
-     * Calculates the number of potential unlocks for a given type and tier
-     * that the player has not yet unlocked and meets the prerequisites for.
-     *
-     * @param type The RelicType to check.
-     * @param tier The SkillTier to check.
-     * @return The number of available unlocks.
-     */
     private int calculateAvailableUnlocks(RelicType type, SkillTier tier) {
         List<UnlockData> potentialUnlocks = unlockManager.getPotentialUnlocks(type, tier);
         if (potentialUnlocks.isEmpty()) {
+            log.trace("calculateAvailableUnlocks: No potential unlocks found for {} {}", type, tier);
             return 0;
         }
-
         Set<String> currentlyUnlockedIds = config.unlockedRelics();
-
         long count = potentialUnlocks.stream()
                 .filter(unlock -> !currentlyUnlockedIds.contains(unlock.getId()))
                 .filter(unlock -> checkPrerequisites(unlock, currentlyUnlockedIds))
                 .count();
-
-        log.trace("Calculated {} available unlocks for {} {}", count, type, tier);
+        log.debug("Calculated {} available unlocks for {} {}", count, type, tier);
         return (int) count;
     }
 
 
-    // Helper to increment the count in config
     private void incrementRelicCount(RelicType type, SkillTier tier) {
         String configKey = getConfigKeyForRelic(type, tier);
         if (configKey == null) {
@@ -669,7 +668,7 @@ public class RelicHunterPlugin extends Plugin
         if (client.getGameState() != GameState.LOGGED_IN) return;
         clientThread.invoke(() -> {
             if (client.getGameState() == GameState.LOGGED_IN) {
-                final String coloredMessage = ColorUtil.wrapWithColorTag(message, Color.MAGENTA); // Example color
+                final String coloredMessage = ColorUtil.wrapWithColorTag(message, Color.MAGENTA);
                 client.addChatMessage(type, PLUGIN_CHAT_NAME, coloredMessage, null);
                 if (type == ChatMessageType.CONSOLE) {
                     log.warn("Relic Hunter Warning: {}", message);
@@ -689,25 +688,20 @@ public class RelicHunterPlugin extends Plugin
 
             if (confirm == JOptionPane.YES_OPTION) {
                 log.info("Resetting Relic Hunter progression.");
-                configManager.unsetConfiguration(CONFIG_GROUP, "unlockedRelics"); // Use unset to clear the set properly
-                // Reset relic counts
+                configManager.unsetConfiguration(CONFIG_GROUP, "unlockedRelics");
                 for (RelicType type : RelicType.values()) {
                     for (SkillTier tier : SkillTier.values()) {
-                        // Only unset tiers used for counts (avoid unsetting LEVEL_X if they existed)
                         if (tier == SkillTier.LOCKED || tier.name().startsWith("LEVEL_")) continue;
                         String key = getConfigKeyForRelic(type, tier);
-                        if (key != null) configManager.unsetConfiguration(CONFIG_GROUP, key); // Unset to use default (0)
+                        if (key != null) configManager.unsetConfiguration(CONFIG_GROUP, key);
                     }
                 }
-                // Reset progression tiers to default by unsetting them
                 configManager.unsetConfiguration(CONFIG_GROUP, "meleeGearTier");
-                // Reset skill tiers
                 for (Skill skill : Skill.values()) {
                     if (skill == Skill.OVERALL || skill == Skill.ATTACK || skill == Skill.STRENGTH || skill == Skill.DEFENCE || skill == Skill.HITPOINTS) continue;
-                    String key = getSkillTierConfigKey(skill); // Get key using helper
-                    if (key != null) configManager.unsetConfiguration(CONFIG_GROUP, key); // Unset to restore default
+                    String key = getSkillTierConfigKey(skill);
+                    if (key != null) configManager.unsetConfiguration(CONFIG_GROUP, key);
                 }
-                // Update UI
                 sendChatMessage("Relic Hunter progression has been reset.", ChatMessageType.GAMEMESSAGE);
                 if (panel != null) {
                     panel.updateRelicCounts();
@@ -720,16 +714,13 @@ public class RelicHunterPlugin extends Plugin
                     initializePreviousXpMap();
                 }
             }
-            // Always set the button back to false regardless of choice
             configManager.setConfiguration(CONFIG_GROUP, "resetProgressionButton", false);
         });
     }
     public SkillTier getSkillTier(Skill skill) {
-        // Always allow combat skills
         if (skill == Skill.ATTACK || skill == Skill.STRENGTH || skill == Skill.DEFENCE || skill == Skill.HITPOINTS) {
             return SkillTier.GRANDMASTER;
         }
-        // Retrieve from config
         switch (skill) {
             case RANGED: return config.rangedTier(); case PRAYER: return config.prayerTier();
             case MAGIC: return config.magicTier(); case RUNECRAFT: return config.runecraftTier();
@@ -741,11 +732,10 @@ public class RelicHunterPlugin extends Plugin
             case SMITHING: return config.smithingTier(); case FISHING: return config.fishingTier();
             case COOKING: return config.cookingTier(); case FIREMAKING: return config.firemakingTier();
             case WOODCUTTING: return config.woodcuttingTier(); case FARMING: return config.farmingTier();
-            default: return SkillTier.LOCKED; // Default for OVERALL or any missed skills
+            default: return SkillTier.LOCKED;
         }
     }
 
-    // Helper to get the config key for a skill tier
     @Nullable
     private String getSkillTierConfigKey(Skill skill) {
         switch (skill) {
@@ -759,7 +749,7 @@ public class RelicHunterPlugin extends Plugin
             case SMITHING: return "smithingTier"; case FISHING: return "fishingTier";
             case COOKING: return "cookingTier"; case FIREMAKING: return "firemakingTier";
             case WOODCUTTING: return "woodcuttingTier"; case FARMING: return "farmingTier";
-            default: return null; // Ignore combat skills and OVERALL
+            default: return null;
         }
     }
 
@@ -772,8 +762,13 @@ public class RelicHunterPlugin extends Plugin
     public GearTier getMeleeGearTier() { return config.meleeGearTier(); }
     private void setMeleeGearTier(GearTier tier) { configManager.setConfiguration(CONFIG_GROUP, "meleeGearTier", tier); }
 
-    private void clearChoiceDisplay() {
-        if (panel != null) panel.clearChoiceDisplay();
+    public void clearChoiceDisplay() {
+        if (relicChoiceOverlay != null) {
+            relicChoiceOverlay.clearChoices();
+        }
+        if(panel != null) {
+            panel.clearChoiceDisplay();
+        }
     }
 
 
@@ -781,6 +776,11 @@ public class RelicHunterPlugin extends Plugin
     @Subscribe
     public void onConfigChanged(ConfigChanged event) {
         if (!event.getGroup().equals(CONFIG_GROUP)) { return; }
+
+        if (event.getKey().equals("showChoiceOverlay") && "false".equals(event.getNewValue())) {
+            clearChoiceDisplay();
+        }
+
         if (event.getKey().equals("useF2PDatabase")) {
             log.info("Database selection changed, reloading...");
             loadUnlockDatabase();
@@ -799,7 +799,6 @@ public class RelicHunterPlugin extends Plugin
             }
             return;
         }
-        // Update panel based on other config changes
         if (panel != null) {
             if (event.getKey().toLowerCase().contains("relics") && !event.getKey().equals("unlockedRelics")) panel.updateRelicCounts();
             if (event.getKey().equals("meleeGearTier") || (event.getKey().toLowerCase().contains("tier") && !event.getKey().equals("resetProgressionButton"))) panel.updateProgressionTiersDisplay();
@@ -816,9 +815,9 @@ public class RelicHunterPlugin extends Plugin
     @Subscribe
     public void onGameStateChanged(GameStateChanged gameStateChanged) {
         if (gameStateChanged.getGameState() == GameState.LOGGED_IN) {
-            lastPlayerRegionId = -1; // Reset region tracking on login
-            loginTick = true; // Set login tick flag
-            initializePreviousXpMap(); // Initialize XP map *after* login state confirmed
+            lastPlayerRegionId = -1;
+            loginTick = true;
+            initializePreviousXpMap();
             if (!initialPanelUpdateDone && panel != null) {
                 log.info("Performing initial panel updates on first login.");
                 clientThread.invokeLater(() -> {
@@ -827,29 +826,24 @@ public class RelicHunterPlugin extends Plugin
                     panel.updateProgressionTiersDisplay();
                     initialPanelUpdateDone = true;
                 });
-            } else if (panel != null) {
+            } else {
                 clearChoiceDisplay();
             }
         } else if (gameStateChanged.getGameState() == GameState.HOPPING) {
             lastPlayerRegionId = -1;
-            if (panel != null) {
-                clearChoiceDisplay();
-            }
+            clearChoiceDisplay();
         } else if (gameStateChanged.getGameState() == GameState.LOGIN_SCREEN || gameStateChanged.getGameState() == GameState.STARTING) {
             initialPanelUpdateDone = false;
             lastPlayerRegionId = -1;
             previousSkillXp.clear();
             recentlyProcessedNpcs.clear();
             loginTick = true;
-            if (panel != null) {
-                clearChoiceDisplay();
-            }
+            clearChoiceDisplay();
         }
     }
 
     @Subscribe
     public void onGameTick(GameTick event) {
-        // Area restriction check
         if (config.warnOnRestrictedAreaEntry() && client.getLocalPlayer() != null) {
             WorldPoint playerLocation = client.getLocalPlayer().getWorldLocation();
             if (playerLocation != null) {
@@ -865,11 +859,9 @@ public class RelicHunterPlugin extends Plugin
             }
         }
 
-        // NPC Cooldown Tick
         int currentTick = client.getTickCount();
         recentlyProcessedNpcs.entrySet().removeIf(entry -> entry.getValue() < currentTick - (NPC_PROCESS_COOLDOWN_TICKS * 2));
 
-        // Process login tick
         if (loginTick) {
             loginTick = false;
             log.debug("Login tick processed, enabling StatChanged relic checks.");
@@ -882,18 +874,17 @@ public class RelicHunterPlugin extends Plugin
         int currentXp = event.getXp();
         int previousXp = previousSkillXp.getOrDefault(skill, 0);
 
-        previousSkillXp.put(skill, currentXp); // Store current XP for next time
+        previousSkillXp.put(skill, currentXp);
 
         if (loginTick || currentXp <= previousXp) {
             return;
         }
         int xpGained = currentXp - previousXp;
 
-        // XP Gain Warning Check
         if (config.warnOnRestrictedXpGain()) {
             SkillTier currentTier = getSkillTier(skill);
             if (currentTier == SkillTier.LOCKED && !(skill == Skill.ATTACK || skill == Skill.STRENGTH || skill == Skill.DEFENCE || skill == Skill.HITPOINTS)) {
-                if (previousXp > 0) { // Avoid login warning
+                if (previousXp > 0) {
                     sendChatMessage("Warning: Gained XP in locked skill: " + skill.getName() + "!", ChatMessageType.CONSOLE);
                 }
             }
@@ -906,7 +897,6 @@ public class RelicHunterPlugin extends Plugin
             }
         }
 
-        // Relic Acquisition Check (Skilling)
         boolean isCombatSkillForRelic = (skill == Skill.ATTACK || skill == Skill.STRENGTH || skill == Skill.DEFENCE || skill == Skill.RANGED || skill == Skill.PRAYER || skill == Skill.MAGIC);
         if (isCombatSkillForRelic || skill == Skill.HITPOINTS || skill == Skill.OVERALL) {
             return;
@@ -916,28 +906,27 @@ public class RelicHunterPlugin extends Plugin
             return;
         }
 
-        SkillTier maxTier = determineMaxTierFromXp(xpGained);
-        if (maxTier == null || maxTier == SkillTier.LOCKED) {
-            log.trace("Max tier was null or LOCKED based on XP {}, no skilling relic tier roll performed.", xpGained);
+        SkillTier maxTier = determineMaxTierFromMinXp(xpGained);
+        if (maxTier == null) {
+            log.trace("XP gain {} too low for any relic tier, no skilling relic roll performed.", xpGained);
             return;
         }
 
         int availableUnlockCount = calculateAvailableUnlocks(RelicType.SKILLING, maxTier);
         if (availableUnlockCount <= 0) {
-            log.trace("No available skilling unlocks for tier {}, no roll performed.", maxTier);
+            log.debug("No available skilling unlocks for tier {}, no roll performed.", maxTier);
             return;
         }
 
         int baseChance = config.skillingRelicBaseChance();
-        if (baseChance <= 0) baseChance = 500; // Fallback
+        if (baseChance <= 0) baseChance = 500;
 
-        // Calculate roll threshold (1 in X)
         int rollThreshold = config.enableScalingDropRate()
-                ? Math.max(1, baseChance / availableUnlockCount) // Higher count = lower threshold = better chance
+                ? Math.max(1, baseChance / availableUnlockCount)
                 : baseChance;
 
-        log.trace("Skilling Relic Roll: MaxTier={}, Available={}, BaseChance={}, Scaling={}, Threshold=1 in {}",
-                maxTier, availableUnlockCount, baseChance, config.enableScalingDropRate(), rollThreshold);
+        log.debug("Attempting skilling relic roll. Skill={}, MaxTier={}, Available={}, BaseChance={}, Scaling={}, Threshold=1 in {}",
+                skill.getName(), maxTier, availableUnlockCount, baseChance, config.enableScalingDropRate(), rollThreshold);
 
         if (random.nextInt(rollThreshold) == 0) {
             log.debug("Skilling relic base roll SUCCESS (1 in {}) for skill {} (XP Gained: {})", rollThreshold, skill.getName(), xpGained);
@@ -977,20 +966,19 @@ public class RelicHunterPlugin extends Plugin
 
         int availableUnlockCount = calculateAvailableUnlocks(RelicType.COMBAT, maxTier);
         if (availableUnlockCount <= 0) {
-            log.trace("No available combat unlocks for tier {}, no roll performed.", maxTier);
+            log.debug("No available combat unlocks for tier {}, no roll performed.", maxTier);
             return;
         }
 
         int baseChance = config.combatRelicBaseChance();
-        if (baseChance <= 0) baseChance = 200; // Fallback
+        if (baseChance <= 0) baseChance = 200;
 
-        // Calculate roll threshold (1 in X)
         int rollThreshold = config.enableScalingDropRate()
-                ? Math.max(1, baseChance / availableUnlockCount) // Higher count = lower threshold = better chance
+                ? Math.max(1, baseChance / availableUnlockCount)
                 : baseChance;
 
-        log.trace("Combat Relic Roll: MaxTier={}, Available={}, BaseChance={}, Scaling={}, Threshold=1 in {}",
-                maxTier, availableUnlockCount, baseChance, config.enableScalingDropRate(), rollThreshold);
+        log.debug("Attempting combat relic roll. NPC={}, MaxTier={}, Available={}, BaseChance={}, Scaling={}, Threshold=1 in {}",
+                npc.getId(), maxTier, availableUnlockCount, baseChance, config.enableScalingDropRate(), rollThreshold);
 
         if (random.nextInt(rollThreshold) == 0) {
             log.debug("Combat relic base roll SUCCESS (1 in {}) for NPC {}!", rollThreshold, npc.getId());
@@ -1012,9 +1000,9 @@ public class RelicHunterPlugin extends Plugin
         if (matcher.matches()) {
             String clueTierString = matcher.group(1).toLowerCase();
             log.debug("Detected clue scroll completion: {}", clueTierString);
-            SkillTier relicTier; // The tier of relic this clue *can* give
+            SkillTier relicTier;
             switch (clueTierString) {
-                case "beginner": return; // Beginners don't give relics
+                case "beginner": return;
                 case "easy":       relicTier = SkillTier.APPRENTICE; break;
                 case "medium":     relicTier = SkillTier.JOURNEYMAN; break;
                 case "hard":       relicTier = SkillTier.EXPERT; break;
@@ -1025,27 +1013,24 @@ public class RelicHunterPlugin extends Plugin
                     return;
             }
 
-            // Calculate available unlocks for this specific tier
             int availableUnlockCount = calculateAvailableUnlocks(RelicType.EXPLORATION, relicTier);
             if (availableUnlockCount <= 0) {
-                log.trace("No available exploration unlocks for tier {}, no roll performed for {} clue.", relicTier, clueTierString);
+                log.debug("No available exploration unlocks for tier {}, no roll performed for {} clue.", relicTier, clueTierString);
                 return;
             }
 
             int baseChance = config.explorationRelicBaseChance();
-            if (baseChance <= 0) baseChance = 10; // Fallback
+            if (baseChance <= 0) baseChance = 10;
 
-            // Calculate roll threshold (1 in X)
             int rollThreshold = config.enableScalingDropRate()
-                    ? Math.max(1, baseChance / availableUnlockCount) // Higher count = lower threshold = better chance
+                    ? Math.max(1, baseChance / availableUnlockCount)
                     : baseChance;
 
-            log.trace("Exploration Relic Roll: Tier={}, Available={}, BaseChance={}, Scaling={}, Threshold=1 in {}",
-                    relicTier, availableUnlockCount, baseChance, config.enableScalingDropRate(), rollThreshold);
+            log.debug("Attempting exploration relic roll. Clue={}, RelicTier={}, Available={}, BaseChance={}, Scaling={}, Threshold=1 in {}",
+                    clueTierString, relicTier, availableUnlockCount, baseChance, config.enableScalingDropRate(), rollThreshold);
 
             if (random.nextInt(rollThreshold) == 0) {
                 log.debug("Exploration relic roll SUCCESS (1 in {}) for {} clue.", rollThreshold, clueTierString);
-                // Exploration relics always give the tier corresponding to the clue
                 addRelic(RelicType.EXPLORATION, relicTier, RelicSource.EXPLORATION, null);
             } else { log.trace("Exploration relic roll FAILED (1 in {}) for {} clue.", rollThreshold, clueTierString); }
         }
@@ -1053,7 +1038,27 @@ public class RelicHunterPlugin extends Plugin
 
     @Subscribe
     public void onMenuOptionClicked(MenuOptionClicked event) {
-        // Only handle Item Restriction Blocking now
+        // Check if the choice overlay handled the click first
+        // The event consumption now happens in the mouseClicked listener
+        if (relicChoiceOverlay.hasChoices() && config.showChoiceOverlay()) {
+            Point mousePos = client.getMouseCanvasPosition();
+            // Check if the click originated within the overlay bounds
+            if (mousePos != null && relicChoiceOverlay.getBounds() != null && relicChoiceOverlay.getBounds().contains(mousePos.getX(), mousePos.getY())) {
+                // If the listener already consumed it, we don't need to do anything more
+                if (event.isConsumed()) {
+                    log.trace("MenuOptionClicked event already consumed by RelicChoiceOverlay listener.");
+                    return;
+                }
+                // If the listener DIDN'T consume it (e.g., click on background),
+                // but it was still inside the overlay, consume it here to prevent game actions.
+                log.trace("MenuOptionClicked consuming event because click was within overlay bounds but not handled by a button.");
+                event.consume();
+                return; // Prevent further processing like item restrictions
+            }
+        }
+
+
+        // Only handle Item Restriction Blocking if the choice overlay didn't consume the click
         if (config.warnOnRestrictedItemUse() || config.attemptBlockRestrictedItemUse()) {
             String clickedOption = event.getMenuOption();
             MenuAction clickedAction = event.getMenuAction();
@@ -1087,14 +1092,17 @@ public class RelicHunterPlugin extends Plugin
 
 
     // --- Relic Acquisition Tier Determination ---
-    private SkillTier determineMaxTierFromXp(int xpGained) {
-        if (xpGained <= 0) return null;
-        if (xpGained > config.skillingRelicXpThresholdMas()) return SkillTier.GRANDMASTER;
-        if (xpGained > config.skillingRelicXpThresholdExp()) return SkillTier.MASTER;
-        if (xpGained > config.skillingRelicXpThresholdJour()) return SkillTier.EXPERT;
-        if (xpGained > config.skillingRelicXpThresholdApp()) return SkillTier.JOURNEYMAN;
+    @Nullable
+    private SkillTier determineMaxTierFromMinXp(int xpGained) {
+        if (xpGained < config.skillingRelicMinXpApp()) return null;
+
+        if (xpGained >= config.skillingRelicMinXpGra()) return SkillTier.GRANDMASTER;
+        if (xpGained >= config.skillingRelicMinXpMas()) return SkillTier.MASTER;
+        if (xpGained >= config.skillingRelicMinXpExp()) return SkillTier.EXPERT;
+        if (xpGained >= config.skillingRelicMinXpJour()) return SkillTier.JOURNEYMAN;
         return SkillTier.APPRENTICE;
     }
+
 
     private SkillTier determineMaxTierFromNpcLevel(int npcLevel) {
         if (npcLevel <= 0) return null;
@@ -1154,4 +1162,7 @@ public class RelicHunterPlugin extends Plugin
     RelicHunterConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(RelicHunterConfig.class);
     }
+
+    // --- REMOVED MouseListener Implementation ---
+
 }

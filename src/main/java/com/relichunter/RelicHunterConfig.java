@@ -95,7 +95,6 @@ public interface RelicHunterConfig extends Config
 
 
     // --- Tiered Relic Counts ---
-    // (Keep existing relic count items)
     @ConfigItem(keyName = "skillingRelicsApprentice", name = "Skilling (Apprentice)", description = "Number of Apprentice Skilling Relics held.", position = 1, section = relicCountsSection)
     default int skillingRelicsApprentice() { return 0; }
     void setSkillingRelicsApprentice(int count);
@@ -160,7 +159,6 @@ public interface RelicHunterConfig extends Config
 
 
     // --- Progression Tiers ---
-    // (Keep existing progression tier items)
     @ConfigItem(keyName = "meleeGearTier", name = "Melee Gear Tier", description = "Highest tier of melee equipment allowed.", position = 11, section = progressionTiersSection)
     default GearTier meleeGearTier() { return GearTier.STEEL; }
     void setMeleeGearTier(GearTier tier);
@@ -247,26 +245,31 @@ public interface RelicHunterConfig extends Config
             keyName = "enableScalingDropRate",
             name = "Enable Scaling Drop Rate",
             description = "Scale relic drop rate based on the number of available unlocks for the tier. Higher available count = better chance.",
-            position = 20, // Position at the top of the section
+            position = 20,
             section = acquisitionSection
     )
-    default boolean enableScalingDropRate() { return true; } // Default to true as requested
+    default boolean enableScalingDropRate() { return true; }
 
     @Range(min = 1, max = 10000)
     @ConfigItem(keyName = "skillingRelicBaseChance", name = "Skilling Base Chance (1 in X)", description = "Base denominator for skilling relic chance. If scaling is enabled, this is divided by the available unlock count.", position = 21, section = acquisitionSection)
     default int skillingRelicBaseChance() { return 500; }
 
-    @ConfigItem(keyName = "skillingRelicXpThresholdApp", name = "Skilling XP Thresh. (Apprentice)", description = "Max XP drop to allow Apprentice relics.", position = 22, section = acquisitionSection)
-    default int skillingRelicXpThresholdApp() { return 10; }
+    // *** RENAMED and updated descriptions for MINIMUM XP ***
+    @ConfigItem(keyName = "skillingRelicMinXpApp", name = "Skilling Min XP (Apprentice)", description = "Minimum XP drop required to be eligible for Apprentice tier relics.", position = 22, section = acquisitionSection)
+    default int skillingRelicMinXpApp() { return 10; } // Example default value
 
-    @ConfigItem(keyName = "skillingRelicXpThresholdJour", name = "Skilling XP Thresh. (Journeyman)", description = "Max XP drop to allow Journeyman relics.", position = 23, section = acquisitionSection)
-    default int skillingRelicXpThresholdJour() { return 30; }
+    @ConfigItem(keyName = "skillingRelicMinXpJour", name = "Skilling Min XP (Journeyman)", description = "Minimum XP drop required to be eligible for Journeyman tier relics.", position = 23, section = acquisitionSection)
+    default int skillingRelicMinXpJour() { return 30; } // Example default value
 
-    @ConfigItem(keyName = "skillingRelicXpThresholdExp", name = "Skilling XP Thresh. (Expert)", description = "Max XP drop to allow Expert relics.", position = 24, section = acquisitionSection)
-    default int skillingRelicXpThresholdExp() { return 70; }
+    @ConfigItem(keyName = "skillingRelicMinXpExp", name = "Skilling Min XP (Expert)", description = "Minimum XP drop required to be eligible for Expert tier relics.", position = 24, section = acquisitionSection)
+    default int skillingRelicMinXpExp() { return 70; } // Example default value
 
-    @ConfigItem(keyName = "skillingRelicXpThresholdMas", name = "Skilling XP Thresh. (Master)", description = "Max XP drop to allow Master relics.", position = 25, section = acquisitionSection)
-    default int skillingRelicXpThresholdMas() { return 150; }
+    @ConfigItem(keyName = "skillingRelicMinXpMas", name = "Skilling Min XP (Master)", description = "Minimum XP drop required to be eligible for Master tier relics.", position = 25, section = acquisitionSection)
+    default int skillingRelicMinXpMas() { return 150; } // Example default value
+
+    @ConfigItem(keyName = "skillingRelicMinXpGra", name = "Skilling Min XP (Grandmaster)", description = "Minimum XP drop required to be eligible for Grandmaster tier relics.", position = 26, section = acquisitionSection)
+    default int skillingRelicMinXpGra() { return 300; } // Example default value for GM
+
 
     @Range(min = 1, max = 10000)
     @ConfigItem(keyName = "combatRelicBaseChance", name = "Combat Base Chance (1 in X)", description = "Base denominator for combat relic chance. If scaling is enabled, this is divided by the available unlock count.", position = 31, section = acquisitionSection)
@@ -284,16 +287,9 @@ public interface RelicHunterConfig extends Config
     @ConfigItem(keyName = "combatRelicNpcLevelMas", name = "Combat NPC Lvl (Master)", description = "Max NPC combat level to allow Master relics.", position = 35, section = acquisitionSection)
     default int combatRelicNpcLevelMas() { return 150; }
 
-    // *** REMOVED OLD EXPLORATION PERCENTAGE CHANCES ***
-    // @Range(min = 0, max = 100)
-    // @ConfigItem(keyName = "explorationRelicChanceEasy", name = "Exploration Chance (Easy %)", description = "Percent chance to get an Apprentice Exploration relic from an Easy casket.", position = 41, section = acquisitionSection)
-    // default int explorationRelicChanceEasy() { return 33; }
-    // ... (removed others) ...
-
-    // *** ADDED NEW EXPLORATION BASE CHANCE ***
     @Range(min = 1, max = 10000)
     @ConfigItem(keyName = "explorationRelicBaseChance", name = "Exploration Base Chance (1 in X)", description = "Base denominator for exploration relic chance (from clues). If scaling is enabled, this is divided by the available unlock count for the clue's tier.", position = 41, section = acquisitionSection)
-    default int explorationRelicBaseChance() { return 10; } // Default to a relatively high chance
+    default int explorationRelicBaseChance() { return 10; }
 
 
     // --- Visual Overlays ---
@@ -313,10 +309,19 @@ public interface RelicHunterConfig extends Config
             keyName = "questRestrictionMode",
             name = "Quest Log Restriction",
             description = "How to display quests in the quest log that are not yet unlocked by the plugin.",
-            position = 54, // Place after skill tier visuals
+            position = 54,
             section = visualOverlaysSection
     )
-    default QuestRestrictionMode questRestrictionMode() { return QuestRestrictionMode.DIM; } // Default to dimming
+    default QuestRestrictionMode questRestrictionMode() { return QuestRestrictionMode.DIM; }
+
+    @ConfigItem(
+            keyName = "showChoiceOverlay",
+            name = "Show Choice Overlay",
+            description = "Display the relic choices as an overlay on the game screen instead of in the side panel.",
+            position = 55,
+            section = visualOverlaysSection
+    )
+    default boolean showChoiceOverlay() { return true; }
 
 
     // --- Visual Effects ---
