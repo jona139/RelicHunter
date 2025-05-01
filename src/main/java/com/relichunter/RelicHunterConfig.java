@@ -7,7 +7,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
-import net.runelite.client.config.Range; // Added import
+import net.runelite.client.config.Range;
 
 import java.awt.Color;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ public interface RelicHunterConfig extends Config
     @ConfigSection(
             name = "General",
             description = "General plugin settings.",
-            position = -2 // Place at the very top
+            position = -2
     )
     String generalSection = "general";
 
@@ -41,11 +41,10 @@ public interface RelicHunterConfig extends Config
     )
     String progressionTiersSection = "progressionTiers";
 
-    // --- NEW SECTION: Relic Acquisition ---
     @ConfigSection(
             name = "Relic Acquisition",
             description = "Configure chances and parameters for obtaining relics.",
-            position = 20, // Position after Progression Tiers
+            position = 20,
             closedByDefault = true
     )
     String acquisitionSection = "acquisition";
@@ -57,6 +56,14 @@ public interface RelicHunterConfig extends Config
             closedByDefault = false
     )
     String visualOverlaysSection = "visualOverlays";
+
+    @ConfigSection(
+            name = "Visual Effects",
+            description = "Configure extra visual effects for unlocks.",
+            position = 60, // Position after Overlays
+            closedByDefault = false
+    )
+    String visualEffectsSection = "visualEffects";
 
     @ConfigSection(
             name = "Warnings & Blocking",
@@ -75,15 +82,16 @@ public interface RelicHunterConfig extends Config
     )
     String managementSection = "management";
 
+
     // --- General Settings ---
     @ConfigItem(
             keyName = "useF2PDatabase",
             name = "Use F2P Unlock Database",
             description = "Check this box to use the F2P unlock database. Uncheck for the default (P2P) database. Requires plugin restart or reload.",
-            position = -1, // Top of General section
+            position = -1,
             section = generalSection
     )
-    default boolean useF2PDatabase() { return false; } // Default to P2P database
+    default boolean useF2PDatabase() { return false; }
 
 
     // --- Tiered Relic Counts ---
@@ -235,10 +243,17 @@ public interface RelicHunterConfig extends Config
 
 
     // --- Relic Acquisition Settings ---
+    @ConfigItem(
+            keyName = "enableScalingDropRate",
+            name = "Enable Scaling Drop Rate",
+            description = "Scale relic drop rate based on the number of available unlocks for the tier. Higher available count = better chance.",
+            position = 20, // Position at the top of the section
+            section = acquisitionSection
+    )
+    default boolean enableScalingDropRate() { return true; } // Default to true as requested
 
-    // Skilling
     @Range(min = 1, max = 10000)
-    @ConfigItem(keyName = "skillingRelicBaseChance", name = "Skilling Base Chance (1 in X)", description = "Base chance to roll for a skilling relic upon gaining eligible XP.", position = 21, section = acquisitionSection)
+    @ConfigItem(keyName = "skillingRelicBaseChance", name = "Skilling Base Chance (1 in X)", description = "Base denominator for skilling relic chance. If scaling is enabled, this is divided by the available unlock count.", position = 21, section = acquisitionSection)
     default int skillingRelicBaseChance() { return 500; }
 
     @ConfigItem(keyName = "skillingRelicXpThresholdApp", name = "Skilling XP Thresh. (Apprentice)", description = "Max XP drop to allow Apprentice relics.", position = 22, section = acquisitionSection)
@@ -252,11 +267,9 @@ public interface RelicHunterConfig extends Config
 
     @ConfigItem(keyName = "skillingRelicXpThresholdMas", name = "Skilling XP Thresh. (Master)", description = "Max XP drop to allow Master relics.", position = 25, section = acquisitionSection)
     default int skillingRelicXpThresholdMas() { return 150; }
-    // Grandmaster is implicitly > Master threshold
 
-    // Combat
     @Range(min = 1, max = 10000)
-    @ConfigItem(keyName = "combatRelicBaseChance", name = "Combat Base Chance (1 in X)", description = "Base chance to roll for a combat relic upon killing an eligible NPC.", position = 31, section = acquisitionSection)
+    @ConfigItem(keyName = "combatRelicBaseChance", name = "Combat Base Chance (1 in X)", description = "Base denominator for combat relic chance. If scaling is enabled, this is divided by the available unlock count.", position = 31, section = acquisitionSection)
     default int combatRelicBaseChance() { return 200; }
 
     @ConfigItem(keyName = "combatRelicNpcLevelApp", name = "Combat NPC Lvl (Apprentice)", description = "Max NPC combat level to allow Apprentice relics.", position = 32, section = acquisitionSection)
@@ -270,29 +283,17 @@ public interface RelicHunterConfig extends Config
 
     @ConfigItem(keyName = "combatRelicNpcLevelMas", name = "Combat NPC Lvl (Master)", description = "Max NPC combat level to allow Master relics.", position = 35, section = acquisitionSection)
     default int combatRelicNpcLevelMas() { return 150; }
-    // Grandmaster is implicitly > Master threshold
 
-    // Exploration (Clues)
-    @Range(min = 0, max = 100)
-    @ConfigItem(keyName = "explorationRelicChanceEasy", name = "Exploration Chance (Easy %)", description = "Percent chance to get an Apprentice Exploration relic from an Easy casket.", position = 41, section = acquisitionSection)
-    default int explorationRelicChanceEasy() { return 33; }
+    // *** REMOVED OLD EXPLORATION PERCENTAGE CHANCES ***
+    // @Range(min = 0, max = 100)
+    // @ConfigItem(keyName = "explorationRelicChanceEasy", name = "Exploration Chance (Easy %)", description = "Percent chance to get an Apprentice Exploration relic from an Easy casket.", position = 41, section = acquisitionSection)
+    // default int explorationRelicChanceEasy() { return 33; }
+    // ... (removed others) ...
 
-    @Range(min = 0, max = 100)
-    @ConfigItem(keyName = "explorationRelicChanceMedium", name = "Exploration Chance (Medium %)", description = "Percent chance to get a Journeyman Exploration relic from a Medium casket.", position = 42, section = acquisitionSection)
-    default int explorationRelicChanceMedium() { return 33; }
-
-    @Range(min = 0, max = 100)
-    @ConfigItem(keyName = "explorationRelicChanceHard", name = "Exploration Chance (Hard %)", description = "Percent chance to get an Expert Exploration relic from a Hard casket.", position = 43, section = acquisitionSection)
-    default int explorationRelicChanceHard() { return 33; }
-
-    @Range(min = 0, max = 100)
-    @ConfigItem(keyName = "explorationRelicChanceElite", name = "Exploration Chance (Elite %)", description = "Percent chance to get a Master Exploration relic from an Elite casket.", position = 44, section = acquisitionSection)
-    default int explorationRelicChanceElite() { return 33; }
-
-    @Range(min = 0, max = 100)
-    @ConfigItem(keyName = "explorationRelicChanceMaster", name = "Exploration Chance (Master %)", description = "Percent chance to get a Grandmaster Exploration relic from a Master casket.", position = 45, section = acquisitionSection)
-    default int explorationRelicChanceMaster() { return 33; }
-    // Beginner/GM caskets might need separate handling or can default
+    // *** ADDED NEW EXPLORATION BASE CHANCE ***
+    @Range(min = 1, max = 10000)
+    @ConfigItem(keyName = "explorationRelicBaseChance", name = "Exploration Base Chance (1 in X)", description = "Base denominator for exploration relic chance (from clues). If scaling is enabled, this is divided by the available unlock count for the clue's tier.", position = 41, section = acquisitionSection)
+    default int explorationRelicBaseChance() { return 10; } // Default to a relatively high chance
 
 
     // --- Visual Overlays ---
@@ -307,6 +308,35 @@ public interface RelicHunterConfig extends Config
 
     @ConfigItem( keyName = "showSkillTierVisuals", name = "Show Skill Tier Visuals", description = "Enable to show tier status (Locked tint, level cap) on the Skills tab.", position = 53, section = visualOverlaysSection )
     default boolean showSkillTierVisuals() { return true; }
+
+    @ConfigItem(
+            keyName = "questRestrictionMode",
+            name = "Quest Log Restriction",
+            description = "How to display quests in the quest log that are not yet unlocked by the plugin.",
+            position = 54, // Place after skill tier visuals
+            section = visualOverlaysSection
+    )
+    default QuestRestrictionMode questRestrictionMode() { return QuestRestrictionMode.DIM; } // Default to dimming
+
+
+    // --- Visual Effects ---
+    @ConfigItem(
+            keyName = "playUnlockEmote",
+            name = "Play Unlock Emote",
+            description = "Play an animation when confirming a relic unlock.",
+            position = 61,
+            section = visualEffectsSection
+    )
+    default boolean playUnlockEmote() { return true; }
+
+    @ConfigItem(
+            keyName = "showUnlockGraphic",
+            name = "Show Unlock Graphic",
+            description = "Show a graphic effect on the player when confirming a relic unlock.",
+            position = 62,
+            section = visualEffectsSection
+    )
+    default boolean showUnlockGraphic() { return true; }
 
 
     // --- Warnings & Blocking ---
